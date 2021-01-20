@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-[RequireComponent(typeof(Toggle))]
 public class SelectOption : MonoBehaviour
 {
+    public Color onColor;
+    public Color offColor;
+
+    [SerializeField]
+    Image backgroundImage;
 
     [SerializeField]
     Image image;
@@ -13,30 +16,19 @@ public class SelectOption : MonoBehaviour
     public SelectionGroup group;
     public int id;
 
-    Toggle toggle;
-
-    private void Awake()
-    {
-        toggle = GetComponent<Toggle>();
-    }
+    public bool IsOn { get; private set; }
 
     public void SetOn(bool isOn) {
-        toggle.isOn = isOn;
-        if (isOn)
-        {
-            toggle.OnSelect(null);
-        }
-        else {
-            toggle.OnDeselect(null);
-        }
+        backgroundImage.color = isOn ? onColor : offColor;
+        IsOn = isOn;
     }
 
     public void SetSprite(Sprite sprite) {
         image.sprite = sprite;
     }
 
-    public void OnToggle(bool isActive)
+    public void OnClick()
     {
-        group.OnToggle(id, isActive);
+        group.OnToggle(id);
     }
 }

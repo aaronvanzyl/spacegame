@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(ToggleGroup))]
+
 public class SelectionGroup : MonoBehaviour
 {
     public bool controlWithNumKeys = false;
@@ -13,13 +13,6 @@ public class SelectionGroup : MonoBehaviour
     int numSelectOptions = 0;
     List<SelectOption> selectOptions = new List<SelectOption>();
 
-    ToggleGroup toggleGroup;
-
-    private void Awake()
-    {
-        toggleGroup = GetComponent<ToggleGroup>();
-    }
-
     private void Update()
     {
         if (controlWithNumKeys) {
@@ -27,21 +20,26 @@ public class SelectionGroup : MonoBehaviour
             {
                 int number;
                 bool isNum = Int32.TryParse(Input.inputString, out number);
-                if (isNum && number >= 0 && number <= 9)
+                if (isNum && number >= 0 && number <= numSelectOptions)
                 {
                     number = number == 0 ? 10 : (number - 1);
-                    Select(number);
+                    OnToggle(number);
                 }
             }
         }
     }
 
-    public void OnToggle(int id, bool isActive)
+    public void OnToggle(int id)
     {
-        if (isActive) {
-            Select(id);
+        bool setOn = !selectOptions[id].IsOn;
+        foreach (SelectOption option in selectOptions)
+        {
+            option.SetOn(setOn && option.id == id);
         }
-        else if (currentlySelected == id)
+        if (setOn) {
+            currentlySelected = id;
+        }
+        else
         {
             currentlySelected = -1;
         }
@@ -55,13 +53,5 @@ public class SelectionGroup : MonoBehaviour
         option.id = numSelectOptions;
         option.group = this;
         numSelectOptions++;
-    }
-
-    public void Select(int index)
-    {
-        currentlySelected = index;
-        foreach (SelectOption option in selectOptions) {
-            option.SetOn(option.id == currentlySelected);
-        }
     }
 }
