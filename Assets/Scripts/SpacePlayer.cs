@@ -22,6 +22,9 @@ namespace SpaceGame {
         // Start is called before the first frame update
         void Start()
         {
+            if (!GetComponent<PhotonView>().IsMine) {
+                enabled = false;
+            }
             rb2d = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
             col = GetComponent<Collider2D>();
