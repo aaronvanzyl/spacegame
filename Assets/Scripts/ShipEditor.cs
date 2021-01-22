@@ -71,7 +71,6 @@ namespace SpaceGame
                 }
 
 
-                Debug.Log(tileEmpty + " " + tileSupported);
                 if (!tileSupported)
                 {
                     ghost.transform.position = cursorPos;

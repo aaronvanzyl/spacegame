@@ -7,9 +7,13 @@ namespace SpaceGame
 {
     public class Tile : MonoBehaviourPunCallbacks, IPunObservable, IPunInstantiateMagicCallback
     {
+        [HideInInspector]
         public Ship ship;
+        [HideInInspector]
         public Vector2Int pos;
-        public bool canOccupy;
+        [HideInInspector]
+        public bool canOccupy = false;
+        [HideInInspector]
         public bool isOccupied;
 
         public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -32,8 +36,6 @@ namespace SpaceGame
 
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
-            Debug.Log("photon instantied");
-
             object[] data = info.photonView.InstantiationData;
             pos.x = (int)data[0];
             pos.y = (int)data[1];
@@ -50,7 +52,10 @@ namespace SpaceGame
 
         public void OnDestroy()
         {
-            ship.OnTileDestroyed(this);
+            if (ship != null)
+            {
+                ship.OnTileDestroyed(this);
+            }
         }
     }
 }

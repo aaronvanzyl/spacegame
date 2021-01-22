@@ -7,22 +7,16 @@ namespace SpaceGame
 {
     public class ShipController : Tile, IPunObservable
     {
+        [HideInInspector]
         public Vector2 moveDirection = Vector2.zero;
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            //this.photonView.TransferOwnership(PhotonNetwork.MasterClient);
+        void Awake() {
+            canOccupy = true;
         }
 
-        // Update is called once per frame
         void Update()
         {
-            if (!photonView.IsMine)
-            {
-                return;
-            }
-            if (isOccupied)
+            if (isOccupied && photonView.IsMine)
             {
                 moveDirection.x = Input.GetAxis("Horizontal");
                 moveDirection.y = Input.GetAxis("Vertical");
