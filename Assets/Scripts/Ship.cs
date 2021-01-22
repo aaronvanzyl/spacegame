@@ -13,26 +13,20 @@ namespace SpaceGame
         public Tile centerTile;
         public float moveForce;
         public Text debugLabel;
-        ShipController controller;
-        Rigidbody2D rb2d;
+        public Rigidbody2D rb2d;
         Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
+        List<ShipController> controllers = new List<ShipController>();
         public List<Tile> tileUpdateList = new List<Tile>();
 
         void Awake()
         {
-            controller = GetComponentInChildren<ShipController>();
             rb2d = GetComponent<Rigidbody2D>();
         }
 
         // Start is called before the first frame update
         void Start()
         {
-
-            if (photonView.IsMine)
-            {
-                GameManager.Instance.localPlayer = this;
-            }
-            if (TryGetComponent<CameraFollow>(out CameraFollow follow))
+            if (TryGetComponent(out CameraController follow))
             {
                 follow.enabled = photonView.IsMine;
             }
@@ -57,7 +51,20 @@ namespace SpaceGame
             {
                 return;
             }
-            rb2d.AddForce(moveForce * controller.direction);
+            Vector2 netMoveDirection = Vector2.zero;
+            int numActiveControllers = 0;
+            foreach (ShipController controller in controllers) {
+                if (controller.moveDirection.magnitude > 0.1f)
+                {
+                    netMoveDirection += controller.moveDirection;
+                    numActiveControllers++;
+                }
+            }
+            if (numActiveControllers > 0)
+            {
+                netMoveDirection /= (float)numActiveControllers;
+                rb2d.AddForce(netMoveDirection * moveForce);
+            }
         }
 
         //public override void OnPlayerEnteredRoom(Player player) { 
@@ -106,7 +113,7 @@ namespace SpaceGame
             return tiles.TryGetValue(pos, out Tile tile) ? tile : null;
         }
 
-        public bool SolidTile(Vector2Int pos)
+        public bool TileExists(Vector2Int pos)
         {
             return tiles.TryGetValue(pos, out _);
         }
@@ -118,6 +125,9 @@ namespace SpaceGame
                 rb2d.mass += 1;
             }
             tiles[tile.pos] = tile;
+            if (tile is ShipController controller) {
+                controllers.Add(controller);
+            }
         }
 
         public void OnTileDestroyed(Tile tile)
@@ -127,9 +137,13 @@ namespace SpaceGame
                 rb2d.mass -= 1;
                 tiles.Remove(tile.pos);
             }
+            if (tile is ShipController controller)
+            {
+                controllers.Remove(controller);
+            }
         }
 
-        public Vector2Int GetTileFromWorldPos(Vector3 worldPos)
+        public Vector2Int WorldToTilePos(Vector3 worldPos)
         {
             Vector3 localPosVec3 = transform.InverseTransformPoint(worldPos);
             Vector2Int tilePos = new Vector2Int(Mathf.RoundToInt(localPosVec3.x), Mathf.RoundToInt(localPosVec3.y));

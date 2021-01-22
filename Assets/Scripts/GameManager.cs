@@ -15,22 +15,17 @@ namespace SpaceGame
     public class GameManager : MonoBehaviourPunCallbacks
     {
         public static GameManager Instance;
-        public Ship localPlayer;
+        public SpacePlayer localPlayer;
         public List<Ship> ships;
         public Ship shipPrefab;
-
+        public SpacePlayer playerPrefab;
 
         public void Awake()
         {
-            //PhotonNetwork.CurrentRoom.AutoCleanUp = false;
-            //RoomOptions opt = new RoomOptions();
-            //opt.CleanupCacheOnLeave = false;
             Instance = this;
-        }
-
-        public void Start()
-        {
-            Ship ship = PhotonNetwork.Instantiate(shipPrefab.name, UnityEngine.Random.insideUnitCircle * 2, Quaternion.identity).GetComponent<Ship>();
+            Vector2 pos = UnityEngine.Random.insideUnitCircle * 10;
+            PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity);
+            localPlayer = PhotonNetwork.Instantiate(playerPrefab.name, pos, Quaternion.identity).GetComponent<SpacePlayer>();
             //ship.photonView.TransferOwnership(PhotonNetwork.MasterClient);
 
         }

@@ -3,53 +3,57 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public class ShipController : MonoBehaviourPunCallbacks, IPunObservable
+namespace SpaceGame
 {
-    public Vector2 direction = Vector2.zero;
-
-    // Start is called before the first frame update
-    void Start()
+    public class ShipController : Tile, IPunObservable
     {
-        //this.photonView.TransferOwnership(PhotonNetwork.MasterClient);
-    }
+        public Vector2 moveDirection = Vector2.zero;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (!photonView.IsMine)
+        // Start is called before the first frame update
+        void Start()
         {
-            return;
+            //this.photonView.TransferOwnership(PhotonNetwork.MasterClient);
         }
 
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f)
+        // Update is called once per frame
+        void Update()
         {
-            direction.x = Input.GetAxis("Horizontal");
-            direction.y = Input.GetAxis("Vertical");
-            if (direction.magnitude > 1)
+            if (!photonView.IsMine)
             {
-                direction.Normalize();
+                return;
+            }
+            if (isOccupied)
+            {
+                moveDirection.x = Input.GetAxis("Horizontal");
+                moveDirection.y = Input.GetAxis("Vertical");
+            }
+            //if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f)
+            //{
+            //    direction.x = Input.GetAxis("Horizontal");
+            //    direction.y = Input.GetAxis("Vertical");
+            //    if (direction.magnitude > 1)
+            //    {
+            //        direction.Normalize();
+            //    }
+            //}
+            //else
+            //{
+            //    direction = Vector2.zero;
+            //}
+        }
+
+        public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            base.OnPhotonSerializeView(stream, info);
+            if (stream.IsWriting)
+            {
+                stream.SendNext(moveDirection);
+            }
+            else
+            {
+                moveDirection = (Vector2)stream.ReceiveNext();
             }
         }
-        else
-        {
-            direction = Vector2.zero;
-        }
-    }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            // We own this player: send the others our data
-            stream.SendNext(direction);
-        }
-        else
-        {
-            // Network player, receive data
-            direction = (Vector2)stream.ReceiveNext();
-        }
     }
-
 }
-

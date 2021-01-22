@@ -50,13 +50,13 @@ namespace SpaceGame
                 Vector2Int tilePos = Vector2Int.zero;
                 foreach (Ship ship in GameManager.Instance.ships)
                 {
-                    tilePos = ship.GetTileFromWorldPos(cursorPos);
+                    tilePos = ship.WorldToTilePos(cursorPos);
                     if (ship.GetTile(tilePos) == null)
                     {
-                        if (ship.SolidTile(tilePos - Vector2Int.left)
-                            || ship.SolidTile(tilePos - Vector2Int.up)
-                            || ship.SolidTile(tilePos - Vector2Int.right)
-                            || ship.SolidTile(tilePos - Vector2Int.down))
+                        if (ship.TileExists(tilePos - Vector2Int.left)
+                            || ship.TileExists(tilePos - Vector2Int.up)
+                            || ship.TileExists(tilePos - Vector2Int.right)
+                            || ship.TileExists(tilePos - Vector2Int.down))
                         {
                             attachedShip = ship;
                             tileSupported = true;

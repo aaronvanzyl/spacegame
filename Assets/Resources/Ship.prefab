@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6158653992312540917}
   - component: {fileID: 6158653992312540910}
   - component: {fileID: 6158653992312540911}
-  - component: {fileID: 2778927234133129967}
   m_Layer: 0
   m_Name: Ship
   m_TagString: Untagged
@@ -53,6 +52,7 @@ MonoBehaviour:
     type: 3}
   moveForce: 5
   debugLabel: {fileID: 6158653993435396036}
+  rb2d: {fileID: 0}
   tileUpdateList: []
 --- !u!50 &6158653992312540917
 Rigidbody2D:
@@ -115,18 +115,6 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
---- !u!114 &2778927234133129967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6158653992312540918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0615ceeba82bc0c42a5a06f4051a3a7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6158653993435396038
 GameObject:
   m_ObjectHideFlags: 0
@@ -249,7 +237,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 684cc8b752a393241b097e7304544b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  direction: {x: 0, y: 0}
+  ship: {fileID: 0}
+  pos: {x: 0, y: 0}
+  canOccupy: 0
+  isOccupied: 0
+  moveDirection: {x: 0, y: 0}
 --- !u!114 &2101432295270043750
 MonoBehaviour:
   m_ObjectHideFlags: 0
