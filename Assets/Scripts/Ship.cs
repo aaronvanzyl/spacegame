@@ -42,7 +42,7 @@ namespace SpaceGame
         void Update()
         {
             //debugLabel.text = photonView.Owner.ActorNumber + " " + controller.photonView.Owner.ActorNumber;
-            debugLabel.text = photonView.Owner.NickName;
+            //debugLabel.text = photonView.Owner.NickName;
         }
 
         private void FixedUpdate()

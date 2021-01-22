@@ -18,8 +18,9 @@ namespace SpaceGame
         {
             if (isOccupied && photonView.IsMine)
             {
-                moveDirection.x = Input.GetAxis("Horizontal");
-                moveDirection.y = Input.GetAxis("Vertical");
+                moveDirection = Vector2.zero;
+                moveDirection += Input.GetAxis("Horizontal") * (Vector2)GameManager.Instance.localPlayer.transform.right;
+                moveDirection += Input.GetAxis("Vertical") * (Vector2)GameManager.Instance.localPlayer.transform.up;
             }
             //if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f)
             //{

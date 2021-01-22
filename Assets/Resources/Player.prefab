@@ -129,7 +129,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Constraints: 0
 --- !u!114 &8369195423579340526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,7 +157,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 0
+  m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
 --- !u!114 &-8452878753138716579
@@ -203,6 +203,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: Moving
+  - Type: 4
+    SynchronizeType: 0
+    Name: InTile
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

@@ -8,6 +8,7 @@ namespace SpaceGame
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(SpriteRenderer))]
     public class SpacePlayer : MonoBehaviourPunCallbacks
     {
         public float groundedMoveSpeed;
@@ -18,6 +19,7 @@ namespace SpaceGame
         Rigidbody2D rb2d;
         Ship attached;
         ContactFilter2D tileContactFilter;
+        SpriteRenderer spriteRenderer;
 
         Tile occupying;
 
@@ -30,6 +32,7 @@ namespace SpaceGame
             rb2d = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
             col = GetComponent<Collider2D>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
 
             tileContactFilter = new ContactFilter2D().NoFilter();
         }
@@ -67,20 +70,19 @@ namespace SpaceGame
             CheckGrounded();
 
             Vector2 input;
+            
             if (occupying == null)
             {
-                input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+                Vector3 eulerAngles = transform.eulerAngles;
+                input = transform.right * Input.GetAxis("Horizontal") + transform.up * Input.GetAxis("Vertical");
                 animator.SetBool("InTile", false);
                 animator.SetBool("Moving", input.magnitude > 0.1f);
 
-                if (input.magnitude > 0.1f)
-                {
-                    transform.eulerAngles = input.x > 0 ? Vector3.zero : new Vector3(0, 180, 0);
-                }
-
                 if (attached != null)
                 {
-                    rb2d.velocity = attached.rb2d.velocity;
+                    eulerAngles.z = attached.transform.eulerAngles.z;
+                    rb2d.angularVelocity = attached.rb2d.angularVelocity;
+                    rb2d.velocity = attached.rb2d.GetPointVelocity(transform.position);
                     if (input.magnitude > 0.1f)
                     {
                         rb2d.AddForce(rb2d.mass * input * groundedMoveSpeed, ForceMode2D.Impulse);
@@ -90,9 +92,17 @@ namespace SpaceGame
                 {
                     rb2d.AddForce(input * ungroundedMoveForce);
                 }
+
+                if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1f)
+                {
+                    spriteRenderer.flipX = Input.GetAxis("Horizontal") < 0;
+                }
+                transform.eulerAngles = eulerAngles;
             }
             else
             {
+                transform.rotation = occupying.transform.rotation;
+                rb2d.angularVelocity = attached.rb2d.angularVelocity;
                 rb2d.transform.position = occupying.transform.position;
                 rb2d.velocity = attached.rb2d.velocity;
             }
