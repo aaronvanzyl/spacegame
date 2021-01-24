@@ -445,6 +445,7 @@ MonoBehaviour:
   - {fileID: 199284011543877522, guid: 9576b516944080946a7de69a2f35d4e6, type: 3}
   - {fileID: -1129959553196538031, guid: 59bb538d561096f4bbd47cafa186b201, type: 3}
   - {fileID: 4358165120112509777, guid: 693ed95b48ffafd47a29461ee93c1725, type: 3}
+  - {fileID: 2318569571033114822, guid: 9959c50873279644f83175a195bc9d0c, type: 3}
   ghost: {fileID: 1490490196}
   ghostInvalidMaterial: {fileID: 2100000, guid: da06603adb5b2c146bf8ede5f7753017,
     type: 2}

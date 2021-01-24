@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 namespace SpaceGame
 {
-
     public class ShipEditor : MonoBehaviour
     {
         int selectedTile = -1;
@@ -16,10 +15,9 @@ namespace SpaceGame
         public Material ghostInvalidMaterial;
         public Material ghostValidMaterial;
         public SelectionGroup tileSelectionGroup;
+        float rotation = 0;
+        bool hasRotated;
 
-
-
-        // Start is called before the first frame update
         void Start()
         {
             SelectTile(0);
@@ -29,7 +27,6 @@ namespace SpaceGame
             }
         }
 
-        // Update is called once per frame
         void Update()
         {
             if (tileSelectionGroup.currentlySelected != selectedTile)
@@ -42,6 +39,16 @@ namespace SpaceGame
             }
             else
             {
+                if (!hasRotated && Mathf.Abs(Input.GetAxis("Rotate")) > 0)
+                {
+                    hasRotated = true;
+                    rotation = (rotation + 90 * Mathf.Sign(Input.GetAxis("Rotate"))) % 360;
+                }
+                else if (Input.GetAxis("Rotate") == 0)
+                {
+                    hasRotated = false;
+                }
+
                 ghost.gameObject.SetActive(true);
                 Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 bool tileEmpty = true;
@@ -70,16 +77,23 @@ namespace SpaceGame
                     }
                 }
 
-
                 if (!tileSupported)
                 {
                     ghost.transform.position = cursorPos;
+                    //ghost.transform.up = GameManager.Instance.localPlayer.transform.up;
                     ghost.transform.up = Vector2.up;
+                    if (tilePrefabs[selectedTile].canRotate) {
+                        ghost.transform.eulerAngles += new Vector3(0, 0, rotation );
+                    }
                 }
                 else
                 {
                     ghost.transform.position = attachedShip.transform.TransformPoint((Vector2)tilePos);
                     ghost.transform.up = attachedShip.transform.up;
+                    if (tilePrefabs[selectedTile].canRotate)
+                    {
+                        ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
+                    }
 
                     if (Physics2D.OverlapBox(ghost.transform.position, Vector2.one * 0.95f, ghost.transform.eulerAngles.z))
                     {
@@ -87,7 +101,7 @@ namespace SpaceGame
                     }
                     if (tileEmpty && Input.GetButtonDown("Fire1"))
                     {
-                        attachedShip.SetTile(tilePos, tilePrefabs[selectedTile].name);
+                        attachedShip.SetTile(tilePos, tilePrefabs[selectedTile].canRotate ? rotation : 0, tilePrefabs[selectedTile].name);
                     }
                 }
 

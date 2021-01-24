@@ -7,6 +7,7 @@ namespace SpaceGame
 {
     public class Tile : MonoBehaviourPunCallbacks, IPunObservable, IPunInstantiateMagicCallback
     {
+        public bool canRotate;
         [HideInInspector]
         public Ship ship;
         [HideInInspector]
@@ -40,11 +41,13 @@ namespace SpaceGame
             pos.x = (int)data[0];
             pos.y = (int)data[1];
             int viewId = (int)data[2];
+            float rotation = (float)data[3];
 
             ship = PhotonView.Find(viewId).GetComponent<Ship>();
             transform.SetParent(ship.transform);
             transform.localPosition = (Vector2)pos;
             transform.up = ship.transform.up;
+            transform.localEulerAngles = new Vector3(0, 0, rotation);
 
             ship.OnTileAdded(this);
         }

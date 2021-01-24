@@ -96,11 +96,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 684cc8b752a393241b097e7304544b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canRotate: 0
   ship: {fileID: 0}
   pos: {x: 0, y: 0}
   canOccupy: 1
   isOccupied: 0
   moveDirection: {x: 0, y: 0}
+  rotation: 0
 --- !u!61 &4358165120112509788
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -48,12 +48,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e5a7456f580da42a509bba625862ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centerTile: {fileID: 199284011543877522, guid: 9576b516944080946a7de69a2f35d4e6,
+  centerTile: {fileID: 4358165120112509777, guid: 693ed95b48ffafd47a29461ee93c1725,
     type: 3}
   moveForce: 5
   debugLabel: {fileID: 6158653993435396036}
   rb2d: {fileID: 0}
-  tileUpdateList: []
+  attachedPlayers: []
 --- !u!50 &6158653992312540917
 Rigidbody2D:
   serializedVersion: 4
@@ -66,9 +66,9 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_Mass: 0.0001
+  m_LinearDrag: 0.2
+  m_AngularDrag: 0.8
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
@@ -237,11 +237,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 684cc8b752a393241b097e7304544b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canRotate: 0
   ship: {fileID: 0}
   pos: {x: 0, y: 0}
   canOccupy: 0
   isOccupied: 0
   moveDirection: {x: 0, y: 0}
+  rotation: 0
 --- !u!114 &2101432295270043750
 MonoBehaviour:
   m_ObjectHideFlags: 0

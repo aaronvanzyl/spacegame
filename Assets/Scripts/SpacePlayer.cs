@@ -23,6 +23,11 @@ namespace SpaceGame
 
         Tile occupying;
 
+        Vector2 relativeInput;
+
+        float baseDrag;
+        float baseAngularDrag;
+
         void Start()
         {
             if (!GetComponent<PhotonView>().IsMine)
@@ -35,10 +40,20 @@ namespace SpaceGame
             spriteRenderer = GetComponent<SpriteRenderer>();
 
             tileContactFilter = new ContactFilter2D().NoFilter();
+            baseDrag = rb2d.drag;
+            baseAngularDrag = rb2d.angularDrag;
         }
 
         private void Update()
         {
+            //relativeInput = transform.right * Input.GetAxis("Horizontal") + transform.up * Input.GetAxis("Vertical");
+            relativeInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            animator.SetBool("Moving", relativeInput.magnitude > 0);
+            if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1f)
+            {
+                spriteRenderer.flipX = Input.GetAxis("Horizontal") < 0;
+            }
+
             if (Input.GetButtonDown("Interact"))
             {
                 Debug.Log("interacting");
@@ -68,40 +83,31 @@ namespace SpaceGame
         void FixedUpdate()
         {
             CheckGrounded();
+            if (attached == null)
+            {
+                rb2d.AddForce(relativeInput * ungroundedMoveForce);
+            }
+        }
 
-            Vector2 input;
-            
+        public void PostShipFixedUpdate()
+        {
+            if (attached == null)
+            {
+                return;
+            }
             if (occupying == null)
             {
                 Vector3 eulerAngles = transform.eulerAngles;
-                input = transform.right * Input.GetAxis("Horizontal") + transform.up * Input.GetAxis("Vertical");
-                animator.SetBool("InTile", false);
-                animator.SetBool("Moving", input.magnitude > 0.1f);
-
-                if (attached != null)
-                {
-                    eulerAngles.z = attached.transform.eulerAngles.z;
-                    rb2d.angularVelocity = attached.rb2d.angularVelocity;
-                    rb2d.velocity = attached.rb2d.GetPointVelocity(transform.position);
-                    if (input.magnitude > 0.1f)
-                    {
-                        rb2d.AddForce(rb2d.mass * input * groundedMoveSpeed, ForceMode2D.Impulse);
-                    }
-                }
-                else
-                {
-                    rb2d.AddForce(input * ungroundedMoveForce);
-                }
-
-                if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1f)
-                {
-                    spriteRenderer.flipX = Input.GetAxis("Horizontal") < 0;
-                }
+                eulerAngles.z = attached.transform.eulerAngles.z;
                 transform.eulerAngles = eulerAngles;
+
+                rb2d.angularVelocity = attached.rb2d.angularVelocity;
+                rb2d.velocity = attached.rb2d.GetPointVelocity(transform.position);
+                rb2d.AddForce(rb2d.mass * relativeInput * groundedMoveSpeed, ForceMode2D.Impulse);
             }
             else
             {
-                transform.rotation = occupying.transform.rotation;
+                transform.rotation = attached.transform.rotation;
                 rb2d.angularVelocity = attached.rb2d.angularVelocity;
                 rb2d.transform.position = occupying.transform.position;
                 rb2d.velocity = attached.rb2d.velocity;
@@ -116,11 +122,29 @@ namespace SpaceGame
             {
                 if (other.isTrigger && other.TryGetComponent(out Tile tile))
                 {
-                    attached = tile.ship;
+                    if (tile.ship != attached)
+                    {
+                        if (attached != null)
+                        {
+                            attached.attachedPlayers.Remove(this);
+                        }
+                        attached = tile.ship;
+                        tile.ship.attachedPlayers.Add(this);
+
+                        rb2d.drag = attached.rb2d.drag;
+                        rb2d.angularDrag = attached.rb2d.angularDrag;
+
+                    }
                     return;
                 }
             }
-            attached = null;
+            if (attached != null)
+            {
+                attached.attachedPlayers.Remove(this);
+                rb2d.drag = baseDrag;
+                rb2d.angularDrag = baseAngularDrag;
+                attached = null;
+            }
         }
     }
 }
