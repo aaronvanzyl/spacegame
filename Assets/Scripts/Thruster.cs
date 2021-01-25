@@ -19,10 +19,10 @@ namespace SpaceGame
             fireEffect.transform.localPosition = new Vector3(0, -0.5f - activation * 0.25f, 0);
         }
 
-        public void ApplyForce()
-        {
-            ship.rb2d.AddForceAtPosition(transform.up * force * activation * Time.fixedDeltaTime, transform.position, ForceMode2D.Impulse);
-        }
+        //public void ApplyForce()
+        //{
+        //    ship.AddForceAtPosition(transform.up * force * activation * Time.fixedDeltaTime, transform.position);
+        //}
 
         public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {

@@ -100,18 +100,18 @@ namespace SpaceGame
             }
             if (occupying == null)
             {
-                Vector3 eulerAngles = transform.eulerAngles;
-                eulerAngles.z = attached.transform.eulerAngles.z;
-                transform.eulerAngles = eulerAngles;
+                //Vector3 eulerAngles = transform.eulerAngles;
+                //eulerAngles.z = attached.transform.eulerAngles.z;
+                //transform.eulerAngles = eulerAngles;
 
-                rb2d.angularVelocity = attached.rb2d.angularVelocity;
+                //rb2d.angularVelocity = attached.rb2d.angularVelocity;
                 rb2d.velocity = attached.rb2d.GetPointVelocity(transform.position);
                 rb2d.AddForce(rb2d.mass * relativeInput * groundedMoveSpeed, ForceMode2D.Impulse);
             }
             else
             {
-                transform.rotation = attached.transform.rotation;
-                rb2d.angularVelocity = attached.rb2d.angularVelocity;
+                //transform.rotation = attached.transform.rotation;
+                //rb2d.angularVelocity = attached.rb2d.angularVelocity;
                 rb2d.transform.position = occupying.transform.position;
                 rb2d.velocity = attached.rb2d.velocity;
             }

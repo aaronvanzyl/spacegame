@@ -19,7 +19,7 @@ namespace SpaceGame
         List<Thruster> thrusters = new List<Thruster>();
         public List<SpacePlayer> attachedPlayers = new List<SpacePlayer>();
         const float E = 0.001f;
-        const float rotationTolerance = 0.1f;
+        const float rotationTolerance = 0.01f;
 
         void Awake()
         {
@@ -61,7 +61,7 @@ namespace SpaceGame
             int numActiveControllers = 0;
             foreach (ShipController controller in controllers)
             {
-                if (controller.moveDirection.magnitude > 0 || Mathf.Abs(controller.rotation) > 0)
+                if (controller.isOccupied)
                 {
                     netRotation += controller.rotation;
                     netMoveDirection += controller.moveDirection;
@@ -74,8 +74,22 @@ namespace SpaceGame
                 netRotation /= (float)numActiveControllers;
                 bool allowOrtho = netMoveDirection.magnitude < E;
                 bool allowRotation = Mathf.Abs(netRotation) > E;
-                Debug.Log(netMoveDirection + " " + allowOrtho + " " + allowRotation);
-                AccelDirection(netMoveDirection, allowOrtho, allowRotation, netMoveDirection.magnitude, netRotation * 50);
+                if (netMoveDirection.magnitude > E || Mathf.Abs(netRotation) > E)
+                {
+
+                    Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
+                    AccelDirection(netMoveDirection, allowOrtho, allowRotation, netMoveDirection.magnitude, netRotation * 10);
+                    float netTorque = 0;
+                    foreach (Thruster t in thrusters) {
+                        netTorque += GetTorque(t) * t.activation;
+                    }
+                    Debug.Log("Net Torque: " + netTorque);
+                }
+                else {
+                    foreach (Thruster t in thrusters) {
+                        t.activation = 0;
+                    }
+                }
                 //rb2d.AddForce(netMoveDirection * moveForce);
                 //foreach (Thruster thruster in thrusters) {
                 //    thruster.activation = netMoveDirection.y;
@@ -83,7 +97,7 @@ namespace SpaceGame
             }
             //print("pre velocity" + rb2d.velocity + " " + rb2d.angularVelocity);
             foreach (Thruster thruster in thrusters) {
-                thruster.ApplyForce();
+                ApplyThrusterForce(thruster);
             }
             //print("post velocity " + rb2d.velocity + " " + rb2d.angularVelocity);
             foreach (SpacePlayer player in attachedPlayers) {
@@ -243,11 +257,15 @@ namespace SpaceGame
             for (int i = 0; i < thrusters.Count; i++)
             {
                 objective[i] = 0;
-                objective[i] += Vector2.Dot(thrusters[i].transform.up, dir) * thrusters[i].force * moveWeight;
-                float torque = GetTorque(thrusters[i]);
+                float movement = Vector2.Dot(thrusters[i].transform.up, dir) * thrusters[i].force * moveWeight;
+                Debug.Log(i + " " + movement);
+                if (Mathf.Abs(movement) > 0.1f) {
+                    objective[i] += movement;
+                }
+                float torque = GetTorque(thrusters[i]) * rotateWeight;
                 if (Mathf.Abs(torque) > 0.1f)
                 {
-                    objective[i] += torque * rotateWeight;
+                    objective[i] += torque;
                 }
             }
 
@@ -277,16 +295,28 @@ namespace SpaceGame
         {
             //Vector2 r = (Vector2)t.transform.position - ((Vector2)transform.position + rb2d.centerOfMass);
             Vector2 r = t.pos - rb2d.centerOfMass;
-            Vector3 localUp = t.transform.InverseTransformDirection(t.transform.up);
-            float angleRad = Vector2.SignedAngle(r, localUp) * Mathf.Deg2Rad;
-            float torqueDeg = r.magnitude * Mathf.Sin(angleRad) * Mathf.Rad2Deg * t.force;
-            Debug.Log(r + " " + angleRad + " " + torqueDeg);
-            return torqueDeg;
+            Vector3 localForce = t.transform.InverseTransformDirection(t.transform.up) * t.force;
+            //float angleRad = Vector2.SignedAngle(r, localUp) * Mathf.Deg2Rad;
+            //Vector3.Cross(r, localUp);
+            //float torqueDeg = r.magnitude * Mathf.Sin(angleRad) * Mathf.Rad2Deg * t.force;
+            //Debug.Log(r + " " + angleRad + " " + torqueDeg);
+            //return torqueDeg;
+            float torque = Vector3.Cross(r, localForce).z;
+            return torque;
+
+            //Debug.Log(r + " " + localForce + " " + torque);
+            //return GetTorque(localForce, t.pos);
         }
+
 
         float PerpDot(Vector2 a, Vector2 b)
         {
             return a.x * b.y - a.y * b.x;
+        }
+
+        public void ApplyThrusterForce(Thruster t) {
+            rb2d.velocity += (Vector2)t.transform.up * t.activation * t.force * Time.fixedDeltaTime / rb2d.mass;
+            rb2d.angularVelocity += GetTorque(t) * t.activation * Time.fixedDeltaTime / rb2d.mass;
         }
     }
 

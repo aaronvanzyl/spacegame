@@ -12,7 +12,8 @@ namespace SpaceGame
         [HideInInspector]
         public float rotation = 0;
 
-        void Awake() {
+        void Awake()
+        {
             canOccupy = true;
         }
 
@@ -21,10 +22,22 @@ namespace SpaceGame
             if (isOccupied && photonView.IsMine)
             {
                 moveDirection = Vector2.zero;
-                moveDirection += Input.GetAxis("Horizontal") * (Vector2)GameManager.Instance.localPlayer.transform.right;
-                moveDirection += Input.GetAxis("Vertical") * (Vector2)GameManager.Instance.localPlayer.transform.up;
-                rotation = Input.GetAxis("Rotate");
+                if (Input.GetButton("Fire2"))
+                {
+                    Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    moveDirection = (cursorPos - (Vector2)GameManager.Instance.localPlayer.transform.position).normalized;
+                }
+                else
+                {
+                    //moveDirection += Input.GetAxis("Horizontal") * Vector2.right;// * (Vector2)GameManager.Instance.localPlayer.transform.right;
+                    //moveDirection += Input.GetAxis("Vertical") * Vector2.up;// * (Vector2)GameManager.Instance.localPlayer.transform.up;
+                    moveDirection += Input.GetAxis("Horizontal") * (Vector2)ship.transform.right;
+                    moveDirection += Input.GetAxis("Vertical") * (Vector2)ship.transform.up;
+                }
             }
+
+            rotation = Input.GetAxis("Rotate");
+
             //if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f)
             //{
             //    direction.x = Input.GetAxis("Horizontal");

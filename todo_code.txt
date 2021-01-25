@@ -1,6 +1,3 @@
-- update ship editor script to use player controller
-	- disable when player enters tile
-	- max dist from player
 - allow placement of non-solid tiles beneath player
 - update parallax layer to loop
 - min/max camera zoom
