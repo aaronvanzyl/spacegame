@@ -24,9 +24,9 @@ namespace SpaceGame
         {
             Instance = this;
             Vector2 pos = UnityEngine.Random.insideUnitCircle * 10;
-            PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity);
+            Ship ship = PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity).GetComponent<Ship>();
             localPlayer = PhotonNetwork.Instantiate(playerPrefab.name, pos, Quaternion.identity).GetComponent<SpacePlayer>();
-            //ship.photonView.TransferOwnership(PhotonNetwork.MasterClient);
+            ship.photonView.TransferOwnership(PhotonNetwork.MasterClient);
 
         }
 

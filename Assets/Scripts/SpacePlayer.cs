@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.UI;
 
 namespace SpaceGame
 {
@@ -11,6 +12,7 @@ namespace SpaceGame
     [RequireComponent(typeof(SpriteRenderer))]
     public class SpacePlayer : MonoBehaviourPunCallbacks
     {
+        public Text nameTag;
         public float groundedMoveSpeed;
         public float ungroundedMoveForce;
 
@@ -30,6 +32,7 @@ namespace SpaceGame
 
         void Start()
         {
+            nameTag.text = photonView.Owner.NickName;
             if (!GetComponent<PhotonView>().IsMine)
             {
                 enabled = false;
