@@ -1,4 +1,3 @@
-- update nametags
 - update ship editor script to use player controller
 	- disable when player enters tile
 	- max dist from player

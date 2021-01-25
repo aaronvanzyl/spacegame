@@ -23,7 +23,7 @@ namespace SpaceGame
         ContactFilter2D tileContactFilter;
         SpriteRenderer spriteRenderer;
 
-        Tile occupying;
+        public Tile occupying;
 
         Vector2 relativeInput;
 

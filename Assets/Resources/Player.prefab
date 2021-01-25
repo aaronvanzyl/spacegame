@@ -304,6 +304,7 @@ MonoBehaviour:
   nameTag: {fileID: 957607754}
   groundedMoveSpeed: 1.5
   ungroundedMoveForce: 0.0001
+  occupying: {fileID: 0}
 --- !u!114 &2585895834986124763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -342,7 +343,7 @@ MonoBehaviour:
   - {fileID: 2585895834986124763}
   - {fileID: 7113975383960678868}
   - {fileID: 3312507949232088362}
-  viewIdField: 1
+  viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!114 &7113975383960678868

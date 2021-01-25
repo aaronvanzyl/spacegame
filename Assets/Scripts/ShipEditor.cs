@@ -12,14 +12,18 @@ namespace SpaceGame
         int selectedTile = -1;
         public Tile[] tilePrefabs;
         public SpriteRenderer ghost;
-        public Material ghostInvalidMaterial;
-        public Material ghostValidMaterial;
+        public Color ghostInvalidColor;
+        public Color ghostValidColor;
+        public Color ghostOutOfRangeColor;
         public SelectionGroup tileSelectionGroup;
+        public float maxPlacementDist;
+        SpacePlayer player;
         float rotation = 0;
         bool hasRotated;
 
         void Start()
         {
+            player = GameManager.Instance.localPlayer;
             SelectTile(0);
             foreach (Tile tile in tilePrefabs)
             {
@@ -29,6 +33,12 @@ namespace SpaceGame
 
         void Update()
         {
+            if (player.occupying != null)
+            {
+                ghost.gameObject.SetActive(false);
+                return;
+            }
+
             if (tileSelectionGroup.currentlySelected != selectedTile)
             {
                 SelectTile(tileSelectionGroup.currentlySelected);
@@ -53,6 +63,7 @@ namespace SpaceGame
                 Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 bool tileEmpty = true;
                 bool tileSupported = false;
+                bool inRange = false;
                 Ship attachedShip = null;
                 Vector2Int tilePos = Vector2Int.zero;
                 foreach (Ship ship in GameManager.Instance.ships)
@@ -82,9 +93,11 @@ namespace SpaceGame
                     ghost.transform.position = cursorPos;
                     //ghost.transform.up = GameManager.Instance.localPlayer.transform.up;
                     ghost.transform.up = Vector2.up;
-                    if (tilePrefabs[selectedTile].canRotate) {
-                        ghost.transform.eulerAngles += new Vector3(0, 0, rotation );
+                    if (tilePrefabs[selectedTile].canRotate)
+                    {
+                        ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
+                    inRange = Vector2.Distance(player.transform.position, ghost.transform.position) <= maxPlacementDist;
                 }
                 else
                 {
@@ -94,18 +107,22 @@ namespace SpaceGame
                     {
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
-
+                    inRange = Vector2.Distance(player.transform.position, ghost.transform.position) <= maxPlacementDist;
                     if (Physics2D.OverlapBox(ghost.transform.position, Vector2.one * 0.95f, ghost.transform.eulerAngles.z))
                     {
                         tileEmpty = false;
                     }
-                    if (tileEmpty && Input.GetButtonDown("Fire1"))
+                    if (tileEmpty && inRange && Input.GetButtonDown("Fire1"))
                     {
                         attachedShip.SetTile(tilePos, tilePrefabs[selectedTile].canRotate ? rotation : 0, tilePrefabs[selectedTile].name);
                     }
                 }
 
-                ghost.material = (tileSupported && tileEmpty) ? ghostValidMaterial : ghostInvalidMaterial;
+                ghost.material.color = (tileSupported && tileEmpty && inRange) ? ghostValidColor : ghostInvalidColor;
+                if (!inRange)
+                {
+                    ghost.material.color *= ghostOutOfRangeColor;
+                }
             }
         }
 
