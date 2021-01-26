@@ -33,10 +33,6 @@ namespace SpaceGame
         void Start()
         {
             nameTag.text = photonView.Owner.NickName;
-            if (!GetComponent<PhotonView>().IsMine)
-            {
-                enabled = false;
-            }
             rb2d = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
             col = GetComponent<Collider2D>();
@@ -45,6 +41,11 @@ namespace SpaceGame
             tileContactFilter = new ContactFilter2D().NoFilter();
             baseDrag = rb2d.drag;
             baseAngularDrag = rb2d.angularDrag;
+
+            if (!GetComponent<PhotonView>().IsMine)
+            {
+                enabled = false;
+            }
         }
 
         private void Update()
@@ -90,6 +91,7 @@ namespace SpaceGame
             {
                 rb2d.AddForce(relativeInput * ungroundedMoveForce);
             }
+            PostShipFixedUpdate();
         }
 
         public void PostShipFixedUpdate()

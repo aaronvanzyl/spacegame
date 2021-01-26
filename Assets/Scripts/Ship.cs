@@ -100,9 +100,9 @@ namespace SpaceGame
                 ApplyThrusterForce(thruster);
             }
             //print("post velocity " + rb2d.velocity + " " + rb2d.angularVelocity);
-            foreach (SpacePlayer player in attachedPlayers) {
-                player.PostShipFixedUpdate();
-            }
+            //foreach (SpacePlayer player in attachedPlayers) {
+            //    player.PostShipFixedUpdate();
+            //}
         }
 
         //public override void OnPlayerEnteredRoom(Player player) { 
@@ -295,16 +295,17 @@ namespace SpaceGame
         {
             //Vector2 r = (Vector2)t.transform.position - ((Vector2)transform.position + rb2d.centerOfMass);
             Vector2 r = t.pos - rb2d.centerOfMass;
-            Vector3 localForce = t.transform.InverseTransformDirection(t.transform.up) * t.force;
+            Vector3 localForce = transform.InverseTransformDirection(t.transform.up) * t.force;
             //float angleRad = Vector2.SignedAngle(r, localUp) * Mathf.Deg2Rad;
             //Vector3.Cross(r, localUp);
             //float torqueDeg = r.magnitude * Mathf.Sin(angleRad) * Mathf.Rad2Deg * t.force;
             //Debug.Log(r + " " + angleRad + " " + torqueDeg);
             //return torqueDeg;
             float torque = Vector3.Cross(r, localForce).z;
+
+            Debug.Log(r + " " + localForce + " " + torque);
             return torque;
 
-            //Debug.Log(r + " " + localForce + " " + torque);
             //return GetTorque(localForce, t.pos);
         }
 
@@ -315,8 +316,9 @@ namespace SpaceGame
         }
 
         public void ApplyThrusterForce(Thruster t) {
-            rb2d.velocity += (Vector2)t.transform.up * t.activation * t.force * Time.fixedDeltaTime / rb2d.mass;
-            rb2d.angularVelocity += GetTorque(t) * t.activation * Time.fixedDeltaTime / rb2d.mass;
+            rb2d.AddForceAtPosition(t.transform.up * t.force * t.activation * Time.fixedDeltaTime, t.transform.position , ForceMode2D.Impulse);
+            //rb2d.velocity += (Vector2)t.transform.up * t.activation * t.force * Time.fixedDeltaTime / rb2d.mass;
+            //rb2d.angularVelocity += GetTorque(t) * t.activation * Time.fixedDeltaTime / rb2d.mass;
         }
     }
 

@@ -21,6 +21,9 @@ namespace SpaceGame
         {
             if (isOccupied && photonView.IsMine)
             {
+                if (!ship.photonView.IsMine) {
+                    ship.photonView.TransferOwnership(PhotonNetwork.LocalPlayer);
+                }
                 moveDirection = Vector2.zero;
                 if (Input.GetButton("Fire2"))
                 {
@@ -34,9 +37,10 @@ namespace SpaceGame
                     moveDirection += Input.GetAxis("Horizontal") * (Vector2)ship.transform.right;
                     moveDirection += Input.GetAxis("Vertical") * (Vector2)ship.transform.up;
                 }
+
+                rotation = Input.GetAxis("Rotate");
             }
 
-            rotation = Input.GetAxis("Rotate");
 
             //if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f)
             //{
@@ -55,14 +59,17 @@ namespace SpaceGame
 
         public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
+            info.
             base.OnPhotonSerializeView(stream, info);
             if (stream.IsWriting)
             {
                 stream.SendNext(moveDirection);
+                stream.SendNext(rotation);
             }
             else
             {
                 moveDirection = (Vector2)stream.ReceiveNext();
+                rotation = (float)stream.ReceiveNext();
             }
         }
 

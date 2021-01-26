@@ -9,7 +9,9 @@ namespace SpaceGame
 {
     public class ShipEditor : MonoBehaviour
     {
-        int selectedTile = -1;
+        int selectedTileIndex = -1;
+        Tile selectedTile;
+        bool selectedTileIsSolid;
         public Tile[] tilePrefabs;
         public SpriteRenderer ghost;
         public Color ghostInvalidColor;
@@ -39,11 +41,11 @@ namespace SpaceGame
                 return;
             }
 
-            if (tileSelectionGroup.currentlySelected != selectedTile)
+            if (tileSelectionGroup.currentlySelected != selectedTileIndex)
             {
                 SelectTile(tileSelectionGroup.currentlySelected);
             }
-            if (selectedTile == -1 || EventSystem.current.IsPointerOverGameObject())
+            if (selectedTileIndex == -1 || EventSystem.current.IsPointerOverGameObject())
             {
                 ghost.gameObject.SetActive(false);
             }
@@ -93,7 +95,7 @@ namespace SpaceGame
                     ghost.transform.position = cursorPos;
                     //ghost.transform.up = GameManager.Instance.localPlayer.transform.up;
                     ghost.transform.up = Vector2.up;
-                    if (tilePrefabs[selectedTile].canRotate)
+                    if (selectedTile.canRotate)
                     {
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
@@ -103,18 +105,21 @@ namespace SpaceGame
                 {
                     ghost.transform.position = attachedShip.transform.TransformPoint((Vector2)tilePos);
                     ghost.transform.up = attachedShip.transform.up;
-                    if (tilePrefabs[selectedTile].canRotate)
+                    if (selectedTile.canRotate)
                     {
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
                     inRange = Vector2.Distance(player.transform.position, ghost.transform.position) <= maxPlacementDist;
-                    if (Physics2D.OverlapBox(ghost.transform.position, Vector2.one * 0.95f, ghost.transform.eulerAngles.z))
-                    {
-                        tileEmpty = false;
+                    Collider2D[] overlapping = Physics2D.OverlapBoxAll(ghost.transform.position, Vector2.one * 0.95f, ghost.transform.eulerAngles.z);
+                    foreach (Collider2D col in overlapping) {
+                        if (col.TryGetComponent<Tile>(out _) || (selectedTileIsSolid && !col.isTrigger)) {
+                            tileEmpty = false;
+                            break;
+                        }
                     }
                     if (tileEmpty && inRange && Input.GetButtonDown("Fire1"))
                     {
-                        attachedShip.SetTile(tilePos, tilePrefabs[selectedTile].canRotate ? rotation : 0, tilePrefabs[selectedTile].name);
+                        attachedShip.SetTile(tilePos, selectedTile.canRotate ? rotation : 0, selectedTile.name);
                     }
                 }
 
@@ -128,10 +133,12 @@ namespace SpaceGame
 
         void SelectTile(int tileIndex)
         {
-            selectedTile = tileIndex;
-            if (selectedTile != -1)
+            selectedTileIndex = tileIndex;
+            if (selectedTileIndex != -1)
             {
-                ghost.sprite = tilePrefabs[selectedTile].GetComponent<SpriteRenderer>().sprite;
+                selectedTile = tilePrefabs[selectedTileIndex];
+                selectedTileIsSolid = !selectedTile.GetComponent<Collider2D>().isTrigger;
+                ghost.sprite = selectedTile.GetComponent<SpriteRenderer>().sprite;
             }
         }
     }

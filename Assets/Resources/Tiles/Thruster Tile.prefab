@@ -184,7 +184,7 @@ MonoBehaviour:
   canOccupy: 0
   isOccupied: 0
   activation: 0
-  force: 50
+  force: 25
   fireEffect: {fileID: 393839621}
 --- !u!61 &2318569571033114823
 BoxCollider2D:
