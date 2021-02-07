@@ -59,7 +59,7 @@ namespace SpaceGame
 
         public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            info.
+            //info.
             base.OnPhotonSerializeView(stream, info);
             if (stream.IsWriting)
             {
