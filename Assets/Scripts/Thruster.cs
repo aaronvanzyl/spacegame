@@ -7,34 +7,40 @@ namespace SpaceGame
 {
     public class Thruster : Tile
     {
-        public float activation;
+        public float Activation { 
+            get {
+                return activation;
+            } 
+            set {
+                if (activation != value)
+                {
+                    activation = value;
+                    MarkForSync();
+                }
+            } 
+        }
+        float activation;
         public float force;
         public GameObject fireEffect;
 
         private void Update()
         {
             Vector3 fireScale = fireEffect.transform.localScale;
-            fireScale.y = activation;
-            fireEffect.transform.localScale = new Vector3(1,activation,1);
-            fireEffect.transform.localPosition = new Vector3(0, -0.5f - activation * 0.25f, 0);
+            fireScale.y = Activation;
+            fireEffect.transform.localScale = new Vector3(1,Activation,1);
+            fireEffect.transform.localPosition = new Vector3(0, -0.5f - Activation * 0.25f, 0);
         }
 
-        //public void ApplyForce()
-        //{
-        //    ship.AddForceAtPosition(transform.up * force * activation * Time.fixedDeltaTime, transform.position);
-        //}
-
-        public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        public override void Serialize(PhotonStream stream)
         {
-            base.OnPhotonSerializeView(stream, info);
-            if (stream.IsWriting)
-            {
-                stream.SendNext(activation);
-            }
-            else
-            {
-                activation = (float)stream.ReceiveNext();
-            }
+            base.Serialize(stream);
+            stream.SendNext(Activation);
+        }
+
+        public override void Deserialize(PhotonStream stream)
+        {
+            base.Deserialize(stream);
+            Activation = (float)stream.ReceiveNext();
         }
     }
 }

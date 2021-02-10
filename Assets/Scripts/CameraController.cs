@@ -14,7 +14,7 @@ namespace SpaceGame
         }
         void Update()
         {
-            Vector3 playerPos = GameManager.Instance.localPlayer.transform.position;
+            Vector3 playerPos = GameManager.Instance.localShip.transform.position;
             transform.position = new Vector3(playerPos.x, playerPos.y, transform.position.z);
             cam.orthographicSize -= Input.mouseScrollDelta.y;
             //Vector3 eulerAngles = transform.eulerAngles;

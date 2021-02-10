@@ -10,40 +10,42 @@ namespace SpaceGame
     [RequireComponent(typeof(Rigidbody))]
     public class Ship : MonoBehaviourPunCallbacks, IPunObservable
     {
-        public Tile centerTile;
         public float moveForce;
         public Text debugLabel;
+        public int centerTileType;
+        public TileLookupScriptableObject tileLookup;
+
+        [HideInInspector]
+        public List<Tile> tileSyncList = new List<Tile>();
+
+        [HideInInspector]
         public Rigidbody2D rb2d;
+
         Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
-        List<ShipController> controllers = new List<ShipController>();
         List<Thruster> thrusters = new List<Thruster>();
-        public List<SpacePlayer> attachedPlayers = new List<SpacePlayer>();
+        ShipController controller;
+
+
         const float E = 0.001f;
         const float rotationTolerance = 0.01f;
 
         void Awake()
         {
             rb2d = GetComponent<Rigidbody2D>();
+            controller = GetComponent<ShipController>();
         }
 
-        // Start is called before the first frame update
         void Start()
         {
 
             rb2d.centerOfMass = Vector2.zero;
-            if (TryGetComponent(out CameraController follow))
-            {
-                follow.enabled = photonView.IsMine;
-            }
             if (photonView.IsMine)
             {
-                SetTile(Vector2Int.zero, 0, centerTile.name);
+                SetTileNetwork(Vector2Int.zero, 0, centerTileType);
             }
             GameManager.Instance.ships.Add(this);
-            //photonView.TransferOwnership(PhotonNetwork.MasterClient);
         }
 
-        // Update is called once per frame
         void Update()
         {
             //debugLabel.text = photonView.Owner.ActorNumber + " " + controller.photonView.Owner.ActorNumber;
@@ -56,95 +58,105 @@ namespace SpaceGame
             {
                 return;
             }
-            float netRotation = 0;
-            Vector2 netMoveDirection = Vector2.zero;
-            int numActiveControllers = 0;
-            foreach (ShipController controller in controllers)
-            {
-                if (controller.isOccupied)
-                {
-                    netRotation += controller.rotation;
-                    netMoveDirection += controller.moveDirection;
-                    numActiveControllers++;
-                }
-            }
-            if (numActiveControllers > 0)
-            {
-                netMoveDirection /= (float)numActiveControllers;
-                netRotation /= (float)numActiveControllers;
-                bool allowOrtho = netMoveDirection.magnitude < E;
-                bool allowRotation = Mathf.Abs(netRotation) > E;
-                if (netMoveDirection.magnitude > E || Mathf.Abs(netRotation) > E)
-                {
 
-                    Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
-                    AccelDirection(netMoveDirection, allowOrtho, allowRotation, netMoveDirection.magnitude, netRotation * 10);
-                    float netTorque = 0;
-                    foreach (Thruster t in thrusters) {
-                        netTorque += GetTorque(t) * t.activation;
-                    }
-                    Debug.Log("Net Torque: " + netTorque);
-                }
-                else {
-                    foreach (Thruster t in thrusters) {
-                        t.activation = 0;
-                    }
-                }
-                //rb2d.AddForce(netMoveDirection * moveForce);
-                //foreach (Thruster thruster in thrusters) {
-                //    thruster.activation = netMoveDirection.y;
+            Vector2 netMoveDirection = controller.moveDirection;
+            float netRotation = controller.rotation;
+
+            bool allowOrtho = netMoveDirection.magnitude < E;
+            bool allowRotation = Mathf.Abs(netRotation) > E;
+            if (netMoveDirection.magnitude > E || Mathf.Abs(netRotation) > E)
+            {
+                //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
+                AccelDirection(netMoveDirection, allowOrtho, allowRotation, netMoveDirection.magnitude, netRotation * 10);
+                //float netTorque = 0;
+                //foreach (Thruster t in thrusters)
+                //{
+                //    netTorque += GetTorque(t) * t.activation;
                 //}
             }
-            //print("pre velocity" + rb2d.velocity + " " + rb2d.angularVelocity);
-            foreach (Thruster thruster in thrusters) {
+            else
+            {
+                foreach (Thruster t in thrusters)
+                {
+                    t.Activation = 0;
+                }
+            }
+            foreach (Thruster thruster in thrusters)
+            {
                 ApplyThrusterForce(thruster);
             }
-            //print("post velocity " + rb2d.velocity + " " + rb2d.angularVelocity);
-            //foreach (SpacePlayer player in attachedPlayers) {
-            //    player.PostShipFixedUpdate();
-            //}
         }
-
-        //public override void OnPlayerEnteredRoom(Player player) { 
-        //    PhotonNetwork.Instantiate()
-        //}
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            //if (stream.IsWriting)
-            //{
-            //    stream.SendNext(tileUpdateList.Count);
-            //    foreach (Tile tile in tileUpdateList) {
-            //        stream.SendNext(tile.pos);
-            //        tile.Serialize(stream);
-            //        tile.awaitingNetworkUpdate = false;
-            //    }
-            //    tileUpdateList.Clear();
-            //}
-            //else
-            //{
-            //    int changedTileCount = (int)stream.ReceiveNext();
-            //    for (int i = 0; i < changedTileCount; i++) {
-            //        Vector2Int pos = (Vector2Int)stream.ReceiveNext();
-            //        tiles[pos].Deserialize(stream);
-            //    }
-            //}
+            if (stream.IsWriting)
+            {
+                stream.SendNext(tileSyncList.Count);
+                foreach (Tile tile in tileSyncList)
+                {
+                    stream.SendNext(tile.pos.x);
+                    stream.SendNext(tile.pos.y);
+                    tile.Serialize(stream);
+                    tile.awaitingSync = false;
+                }
+                tileSyncList.Clear();
+            }
+            else
+            {
+                int changedTileCount = (int)stream.ReceiveNext();
+                for (int i = 0; i < changedTileCount; i++)
+                {
+                    Vector2Int pos = new Vector2Int();
+                    pos.x = (int)stream.ReceiveNext();
+                    pos.y = (int)stream.ReceiveNext();
+                    tiles[pos].Deserialize(stream);
+                }
+            }
         }
 
 
-        public void SetTile(Vector2Int pos, float rotation, string prefabName)
+        [PunRPC]
+        void SetTileRPC(int x, int y, float rotation, int tileType)
         {
+            Vector2Int pos = new Vector2Int(x, y);
             if (tiles.TryGetValue(pos, out Tile existing))
             {
-                PhotonNetwork.Destroy(existing.photonView);
+                DestroyTile(existing);
             }
 
-            object[] data = new object[4];
-            data[0] = pos.x;
-            data[1] = pos.y;
-            data[2] = photonView.ViewID;
-            data[3] = rotation;
-            PhotonNetwork.Instantiate("Tiles/" + prefabName, Vector3.zero, Quaternion.identity, data: data);
+            // Create tile
+            Tile tile = Instantiate(tileLookup.tilePrefabs[tileType], transform).GetComponent<Tile>();
+            tile.transform.localPosition = (Vector2)pos;
+            tile.pos = pos;
+            tile.transform.localEulerAngles = new Vector3(0, 0, rotation);
+            tiles[tile.pos] = tile;
+            tile.ship = this;
+
+            // Update CoM
+            rb2d.centerOfMass = (rb2d.mass * rb2d.centerOfMass + (Vector2)tile.pos) / (rb2d.mass + 1);
+            rb2d.mass += 1;
+
+            // Update lists
+            if (tile is Thruster thruster)
+            {
+                thrusters.Add(thruster);
+            }
+        }
+
+        public void SetTileNetwork(Vector2Int pos, float rotation, int tileType)
+        {
+            photonView.RPC("SetTileRPC", RpcTarget.All, pos.x, pos.y, rotation, tileType);
+        }
+
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            if (newPlayer == PhotonNetwork.LocalPlayer) {
+                return;
+            }
+            foreach (KeyValuePair<Vector2Int, Tile> pair in tiles)
+            {
+                photonView.RPC("SetTileRPC", newPlayer, pair.Key.x, pair.Key.y, 0f, pair.Value.tileType);
+            }
         }
 
         public Tile GetTile(Vector2Int pos)
@@ -157,44 +169,22 @@ namespace SpaceGame
             return tiles.TryGetValue(pos, out _);
         }
 
-        public void OnTileAdded(Tile tile)
-        {
-            if (photonView.IsMine)
-            {
-                tile.photonView.TransferOwnership(PhotonNetwork.LocalPlayer);
-            }
-            if (!tiles.TryGetValue(tile.pos, out _))
-            {
-                rb2d.centerOfMass = (rb2d.mass * rb2d.centerOfMass + (Vector2)tile.pos) / (rb2d.mass + 1);
-                rb2d.mass += 1;
-            }
-            tiles[tile.pos] = tile;
-            if (tile is ShipController controller)
-            {
-                controllers.Add(controller);
-            }
-            if (tile is Thruster thruster)
-            {
-                thrusters.Add(thruster);
-            }
-        }
 
-        public void OnTileDestroyed(Tile tile)
+        public void DestroyTile(Tile tile)
         {
-            if (tiles[tile.pos] == tile)
-            {
-                rb2d.centerOfMass = (rb2d.mass * rb2d.centerOfMass - (Vector2)tile.pos) / (rb2d.mass - 1);
-                rb2d.mass -= 1;
-                tiles.Remove(tile.pos);
-            }
-            if (tile is ShipController controller)
-            {
-                controllers.Remove(controller);
-            }
+            // Update CoM
+            rb2d.centerOfMass = (rb2d.mass * rb2d.centerOfMass - (Vector2)tile.pos) / (rb2d.mass - 1);
+            rb2d.mass -= 1;
+
+            // Update lists
             if (tile is Thruster thruster)
             {
                 thrusters.Remove(thruster);
             }
+
+            // Destroy tile
+            tiles.Remove(tile.pos);
+            Destroy(tile.gameObject);
         }
 
         public Vector2Int WorldToTilePos(Vector3 worldPos)
@@ -253,13 +243,14 @@ namespace SpaceGame
 
             // Set objective (maximum parallel force)
 
-            print("---");
+            //print("---");
             for (int i = 0; i < thrusters.Count; i++)
             {
                 objective[i] = 0;
                 float movement = Vector2.Dot(thrusters[i].transform.up, dir) * thrusters[i].force * moveWeight;
-                Debug.Log(i + " " + movement);
-                if (Mathf.Abs(movement) > 0.1f) {
+                //Debug.Log(i + " " + movement);
+                if (Mathf.Abs(movement) > 0.1f)
+                {
                     objective[i] += movement;
                 }
                 float torque = GetTorque(thrusters[i]) * rotateWeight;
@@ -275,7 +266,7 @@ namespace SpaceGame
             {
                 for (int i = 0; i < thrusters.Count; i++)
                 {
-                    thrusters[i].activation = (float)result[i] * accelMult;
+                    thrusters[i].Activation = (float)result[i] * accelMult;
                 }
                 //print("Found solution!");
             }
@@ -285,7 +276,7 @@ namespace SpaceGame
                 for (int i = 0; i < thrusters.Count; i++)
                 {
 
-                    thrusters[i].activation = 0;
+                    thrusters[i].Activation = 0;
                 }
 
             }
@@ -293,20 +284,12 @@ namespace SpaceGame
 
         float GetTorque(Thruster t)
         {
-            //Vector2 r = (Vector2)t.transform.position - ((Vector2)transform.position + rb2d.centerOfMass);
             Vector2 r = t.pos - rb2d.centerOfMass;
             Vector3 localForce = transform.InverseTransformDirection(t.transform.up) * t.force;
-            //float angleRad = Vector2.SignedAngle(r, localUp) * Mathf.Deg2Rad;
-            //Vector3.Cross(r, localUp);
-            //float torqueDeg = r.magnitude * Mathf.Sin(angleRad) * Mathf.Rad2Deg * t.force;
-            //Debug.Log(r + " " + angleRad + " " + torqueDeg);
-            //return torqueDeg;
             float torque = Vector3.Cross(r, localForce).z;
 
-            Debug.Log(r + " " + localForce + " " + torque);
+            //Debug.Log(r + " " + localForce + " " + torque);
             return torque;
-
-            //return GetTorque(localForce, t.pos);
         }
 
 
@@ -315,10 +298,9 @@ namespace SpaceGame
             return a.x * b.y - a.y * b.x;
         }
 
-        public void ApplyThrusterForce(Thruster t) {
-            rb2d.AddForceAtPosition(t.transform.up * t.force * t.activation * Time.fixedDeltaTime, t.transform.position , ForceMode2D.Impulse);
-            //rb2d.velocity += (Vector2)t.transform.up * t.activation * t.force * Time.fixedDeltaTime / rb2d.mass;
-            //rb2d.angularVelocity += GetTorque(t) * t.activation * Time.fixedDeltaTime / rb2d.mass;
+        public void ApplyThrusterForce(Thruster t)
+        {
+            rb2d.AddForceAtPosition(t.transform.up * t.force * t.Activation * Time.fixedDeltaTime, t.transform.position, ForceMode2D.Impulse);
         }
     }
 

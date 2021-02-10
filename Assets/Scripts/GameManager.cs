@@ -1,32 +1,27 @@
-﻿using System;
-using System.Collections;
-
-
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
+﻿
 
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace SpaceGame
 {
     public class GameManager : MonoBehaviourPunCallbacks
     {
         public static GameManager Instance;
-        public SpacePlayer localPlayer;
+        [HideInInspector]
+        public Ship localShip;
+        [HideInInspector]
         public List<Ship> ships;
         public Ship shipPrefab;
-        public SpacePlayer playerPrefab;
 
         public void Awake()
         {
             Instance = this;
-            Vector2 pos = UnityEngine.Random.insideUnitCircle * 10;
-            Ship ship = PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity).GetComponent<Ship>();
-            localPlayer = PhotonNetwork.Instantiate(playerPrefab.name, pos, Quaternion.identity).GetComponent<SpacePlayer>();
-            ship.photonView.TransferOwnership(PhotonNetwork.MasterClient);
+            Vector2 pos = Random.insideUnitCircle * 10;
+            localShip = PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity).GetComponent<Ship>();
 
         }
 

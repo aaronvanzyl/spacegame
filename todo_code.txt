@@ -1,3 +1,0 @@
-- allow placement of non-solid tiles beneath player
-- update parallax layer to loop
-- min/max camera zoom

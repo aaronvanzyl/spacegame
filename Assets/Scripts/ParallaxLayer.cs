@@ -7,21 +7,15 @@ namespace SpaceGame
     public class ParallaxLayer : MonoBehaviour
     {
         public float depth;
-        // Start is called before the first frame update
-        void Start()
-        {
 
-        }
-
-        // Update is called once per frame
         void Update()
         {
-            if (GameManager.Instance.localPlayer == null)
+            if (Camera.main == null)
             {
                 return;
             }
-            Vector2 playerPos = GameManager.Instance.localPlayer.transform.position;
-            transform.position = playerPos - (playerPos) / depth;
+            Vector2 cameraPos = Camera.main.transform.position;
+            transform.position = cameraPos - (cameraPos) / depth;
         }
     }
 }

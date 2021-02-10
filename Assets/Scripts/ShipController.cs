@@ -5,72 +5,42 @@ using UnityEngine;
 
 namespace SpaceGame
 {
-    public class ShipController : Tile
+    [RequireComponent(typeof(Ship))]
+    public class ShipController : MonoBehaviour
     {
+        [HideInInspector]
+        Ship ship;
         [HideInInspector]
         public Vector2 moveDirection = Vector2.zero;
         [HideInInspector]
         public float rotation = 0;
 
-        void Awake()
+        private void Awake()
         {
-            canOccupy = true;
+            ship = GetComponent<Ship>();
         }
 
         void Update()
         {
-            if (isOccupied && photonView.IsMine)
+            if (!ship.photonView.IsMine)
             {
-                if (!ship.photonView.IsMine) {
-                    ship.photonView.TransferOwnership(PhotonNetwork.LocalPlayer);
-                }
-                moveDirection = Vector2.zero;
-                if (Input.GetButton("Fire2"))
-                {
-                    Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    moveDirection = (cursorPos - (Vector2)GameManager.Instance.localPlayer.transform.position).normalized;
-                }
-                else
-                {
-                    //moveDirection += Input.GetAxis("Horizontal") * Vector2.right;// * (Vector2)GameManager.Instance.localPlayer.transform.right;
-                    //moveDirection += Input.GetAxis("Vertical") * Vector2.up;// * (Vector2)GameManager.Instance.localPlayer.transform.up;
-                    moveDirection += Input.GetAxis("Horizontal") * (Vector2)ship.transform.right;
-                    moveDirection += Input.GetAxis("Vertical") * (Vector2)ship.transform.up;
-                }
-
-                rotation = Input.GetAxis("Rotate");
+                return;
             }
-
-
-            //if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.01f)
-            //{
-            //    direction.x = Input.GetAxis("Horizontal");
-            //    direction.y = Input.GetAxis("Vertical");
-            //    if (direction.magnitude > 1)
-            //    {
-            //        direction.Normalize();
-            //    }
-            //}
-            //else
-            //{
-            //    direction = Vector2.zero;
-            //}
-        }
-
-        public override void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        {
-            //info.
-            base.OnPhotonSerializeView(stream, info);
-            if (stream.IsWriting)
+            moveDirection = Vector2.zero;
+            if (Input.GetButton("Fire2"))
             {
-                stream.SendNext(moveDirection);
-                stream.SendNext(rotation);
+                Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                moveDirection = (cursorPos - (Vector2)GameManager.Instance.localShip.transform.position).normalized;
             }
             else
             {
-                moveDirection = (Vector2)stream.ReceiveNext();
-                rotation = (float)stream.ReceiveNext();
+                //moveDirection += Input.GetAxis("Horizontal") * Vector2.right;// * (Vector2)GameManager.Instance.localPlayer.transform.right;
+                //moveDirection += Input.GetAxis("Vertical") * Vector2.up;// * (Vector2)GameManager.Instance.localPlayer.transform.up;
+                moveDirection += Input.GetAxis("Horizontal") * (Vector2)ship.transform.right;
+                moveDirection += Input.GetAxis("Vertical") * (Vector2)ship.transform.up;
             }
+
+            rotation = Input.GetAxis("Rotate");
         }
 
     }

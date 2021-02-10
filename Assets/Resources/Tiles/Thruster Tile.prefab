@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 393839621}
   m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
   m_LocalPosition: {x: 0, y: -0.6, z: 0}
-  m_LocalScale: {x: 1, y: 0.4, z: 1}
+  m_LocalScale: {x: 1, y: 0, z: 1}
   m_Children: []
   m_Father: {fileID: 2318569571033114820}
   m_RootOrder: 0
@@ -68,7 +68,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1069820433
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 597f929c5acb5b54bb33fefc8f6fc7c1, type: 3}
   m_Color: {r: 0.8113208, g: 0.3329477, b: 0.3329477, a: 1}
@@ -153,7 +153,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1013435615
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 454b09ba1d3976347aa4d13e0386360f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -178,12 +178,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b35b27095e37d741a6cc2f3c82eba65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: 0
   canRotate: 1
   ship: {fileID: 0}
   pos: {x: 0, y: 0}
-  canOccupy: 0
-  isOccupied: 0
-  activation: 0
+  awaitingSync: 0
   force: 25
   fireEffect: {fileID: 393839621}
 --- !u!61 &2318569571033114823
@@ -230,8 +229,7 @@ MonoBehaviour:
   observableSearch: 2
   Synchronization: 3
   OwnershipTransfer: 1
-  ObservedComponents:
-  - {fileID: 2318569571033114822}
+  ObservedComponents: []
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

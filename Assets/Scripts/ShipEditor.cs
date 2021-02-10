@@ -12,22 +12,20 @@ namespace SpaceGame
         int selectedTileIndex = -1;
         Tile selectedTile;
         bool selectedTileIsSolid;
-        public Tile[] tilePrefabs;
+        public TileLookupScriptableObject tileLookup;
         public SpriteRenderer ghost;
         public Color ghostInvalidColor;
         public Color ghostValidColor;
         public Color ghostOutOfRangeColor;
         public SelectionGroup tileSelectionGroup;
         public float maxPlacementDist;
-        SpacePlayer player;
         float rotation = 0;
         bool hasRotated;
 
         void Start()
         {
-            player = GameManager.Instance.localPlayer;
             SelectTile(0);
-            foreach (Tile tile in tilePrefabs)
+            foreach (Tile tile in tileLookup.tilePrefabs)
             {
                 tileSelectionGroup.AddSelectOption(tile.GetComponent<SpriteRenderer>().sprite);
             }
@@ -35,11 +33,6 @@ namespace SpaceGame
 
         void Update()
         {
-            if (player.occupying != null)
-            {
-                ghost.gameObject.SetActive(false);
-                return;
-            }
 
             if (tileSelectionGroup.currentlySelected != selectedTileIndex)
             {
@@ -65,7 +58,6 @@ namespace SpaceGame
                 Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 bool tileEmpty = true;
                 bool tileSupported = false;
-                bool inRange = false;
                 Ship attachedShip = null;
                 Vector2Int tilePos = Vector2Int.zero;
                 foreach (Ship ship in GameManager.Instance.ships)
@@ -99,7 +91,6 @@ namespace SpaceGame
                     {
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
-                    inRange = Vector2.Distance(player.transform.position, ghost.transform.position) <= maxPlacementDist;
                 }
                 else
                 {
@@ -109,7 +100,6 @@ namespace SpaceGame
                     {
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
-                    inRange = Vector2.Distance(player.transform.position, ghost.transform.position) <= maxPlacementDist;
                     Collider2D[] overlapping = Physics2D.OverlapBoxAll(ghost.transform.position, Vector2.one * 0.95f, ghost.transform.eulerAngles.z);
                     foreach (Collider2D col in overlapping) {
                         if (col.TryGetComponent<Tile>(out _) || (selectedTileIsSolid && !col.isTrigger)) {
@@ -117,17 +107,13 @@ namespace SpaceGame
                             break;
                         }
                     }
-                    if (tileEmpty && inRange && Input.GetButtonDown("Fire1"))
+                    if (tileEmpty && attachedShip == GameManager.Instance.localShip && Input.GetButtonDown("Fire1"))
                     {
-                        attachedShip.SetTile(tilePos, selectedTile.canRotate ? rotation : 0, selectedTile.name);
+                        attachedShip.SetTileNetwork(tilePos, selectedTile.canRotate ? rotation : 0, selectedTileIndex);
                     }
                 }
 
-                ghost.material.color = (tileSupported && tileEmpty && inRange) ? ghostValidColor : ghostInvalidColor;
-                if (!inRange)
-                {
-                    ghost.material.color *= ghostOutOfRangeColor;
-                }
+                ghost.material.color = (tileSupported && tileEmpty && attachedShip == GameManager.Instance.localShip) ? ghostValidColor : ghostInvalidColor;
             }
         }
 
@@ -136,7 +122,7 @@ namespace SpaceGame
             selectedTileIndex = tileIndex;
             if (selectedTileIndex != -1)
             {
-                selectedTile = tilePrefabs[selectedTileIndex];
+                selectedTile = tileLookup.tilePrefabs[selectedTileIndex];
                 selectedTileIsSolid = !selectedTile.GetComponent<Collider2D>().isTrigger;
                 ghost.sprite = selectedTile.GetComponent<SpriteRenderer>().sprite;
             }

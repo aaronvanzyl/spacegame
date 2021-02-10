@@ -5,60 +5,47 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace SpaceGame
 {
-    public class Tile : MonoBehaviourPunCallbacks, IPunObservable, IPunInstantiateMagicCallback
+    public class Tile : MonoBehaviourPunCallbacks
     {
+        public int tileType;
         public bool canRotate;
         [HideInInspector]
         public Ship ship;
         [HideInInspector]
         public Vector2Int pos;
-        [HideInInspector]
-        public bool canOccupy = false;
-        [HideInInspector]
-        public bool isOccupied;
+        public bool awaitingSync;
 
-        public virtual void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-        {
-            if (stream.IsWriting)
-            {
-                if (canOccupy)
-                {
-                    stream.SendNext(isOccupied);
-                }
-            }
-            else
-            {
-                if (canOccupy)
-                {
-                    isOccupied = (bool)stream.ReceiveNext();
-                }
+        protected void MarkForSync() {
+            if (!awaitingSync) {
+                awaitingSync = true;
+                ship.tileSyncList.Add(this);
             }
         }
 
-        public void OnPhotonInstantiate(PhotonMessageInfo info)
+        public virtual void Serialize(PhotonStream stream)
         {
-            object[] data = info.photonView.InstantiationData;
-            pos.x = (int)data[0];
-            pos.y = (int)data[1];
-            int viewId = (int)data[2];
-            float rotation = (float)data[3];
-
-            ship = PhotonView.Find(viewId).GetComponent<Ship>();
-            transform.SetParent(ship.transform);
-            transform.localPosition = (Vector2)pos;
-            transform.up = ship.transform.up;
-            transform.localEulerAngles = new Vector3(0, 0, rotation);
-
-            ship.OnTileAdded(this);
         }
 
-
-        public void OnDestroy()
-        {
-            if (ship != null)
-            {
-                ship.OnTileDestroyed(this);
-            }
+        public virtual void Deserialize(PhotonStream stream) { 
+        
         }
+
+        //public void OnPhotonInstantiate(PhotonMessageInfo info)
+        //{
+        //    object[] data = info.photonView.InstantiationData;
+        //    pos.x = (int)data[0];
+        //    pos.y = (int)data[1];
+        //    int viewId = (int)data[2];
+        //    float rotation = (float)data[3];
+
+        //    ship = PhotonView.Find(viewId).GetComponent<Ship>();
+        //    transform.SetParent(ship.transform);
+        //    transform.localPosition = (Vector2)pos;
+        //    transform.up = ship.transform.up;
+        //    transform.localEulerAngles = new Vector3(0, 0, rotation);
+
+        //    ship.OnTileAdded(this);
+        //}
+
     }
 }

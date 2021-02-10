@@ -441,11 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59df1a5e5026c10469533357c67ee8c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefabs:
-  - {fileID: 199284011543877522, guid: 9576b516944080946a7de69a2f35d4e6, type: 3}
-  - {fileID: -1129959553196538031, guid: 59bb538d561096f4bbd47cafa186b201, type: 3}
-  - {fileID: 4358165120112509777, guid: 693ed95b48ffafd47a29461ee93c1725, type: 3}
-  - {fileID: 2318569571033114822, guid: 9959c50873279644f83175a195bc9d0c, type: 3}
+  tileLookup: {fileID: 11400000, guid: 50f2cdfeb73904843b1d98fdb2a042f7, type: 2}
   ghost: {fileID: 1490490196}
   ghostInvalidColor: {r: 1, g: 0, b: 0, a: 0.5882353}
   ghostValidColor: {r: 1, g: 1, b: 1, a: 0.5882353}
@@ -1120,11 +1116,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe3fd16f7c37cde499402e8c11989145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localPlayer: {fileID: 0}
+  localShip: {fileID: 0}
   ships: []
   shipPrefab: {fileID: 6158653992312540916, guid: 639ef908c71cb2646849981ba40bcb89,
-    type: 3}
-  playerPrefab: {fileID: 8369195423579340526, guid: 6ac3603193ba5b14d86e3fb8b1543729,
     type: 3}
 --- !u!4 &1427014006
 Transform:
