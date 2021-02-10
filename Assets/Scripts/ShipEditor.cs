@@ -24,11 +24,12 @@ namespace SpaceGame
 
         void Start()
         {
-            SelectTile(0);
             foreach (Tile tile in tileLookup.tilePrefabs)
             {
                 tileSelectionGroup.AddSelectOption(tile.GetComponent<SpriteRenderer>().sprite);
             }
+            tileSelectionGroup.OnToggle(0);
+            ToggleOn(false);
         }
 
         void Update()
@@ -126,6 +127,13 @@ namespace SpaceGame
                 selectedTileIsSolid = !selectedTile.GetComponent<Collider2D>().isTrigger;
                 ghost.sprite = selectedTile.GetComponent<SpriteRenderer>().sprite;
             }
+        }
+
+        public void ToggleOn(bool isOn) {
+            gameObject.SetActive(isOn);
+            ghost.gameObject.SetActive(isOn);
+            tileSelectionGroup.gameObject.SetActive(isOn);
+            GameManager.Instance.localShip.editorIsActive = isOn;
         }
     }
 }

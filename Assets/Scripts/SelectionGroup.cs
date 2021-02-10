@@ -8,8 +8,9 @@ using UnityEngine.UI;
 public class SelectionGroup : MonoBehaviour
 {
     public bool controlWithNumKeys = false;
-    public int currentlySelected = -1;
+    public int currentlySelected = 0;
     public SelectOption selectOptionPrefab;
+    public bool canSelectNothing;
     int numSelectOptions = 0;
     List<SelectOption> selectOptions = new List<SelectOption>();
 
@@ -31,7 +32,7 @@ public class SelectionGroup : MonoBehaviour
 
     public void OnToggle(int id)
     {
-        bool setOn = !selectOptions[id].IsOn;
+        bool setOn = canSelectNothing ? !selectOptions[id].IsOn : true;
         foreach (SelectOption option in selectOptions)
         {
             option.SetOn(setOn && option.id == id);

@@ -25,9 +25,10 @@ namespace SpaceGame
         List<Thruster> thrusters = new List<Thruster>();
         ShipController controller;
 
-
         const float E = 0.001f;
         const float rotationTolerance = 0.01f;
+
+        public bool editorIsActive;
 
         void Awake()
         {
@@ -64,7 +65,7 @@ namespace SpaceGame
 
             bool allowOrtho = netMoveDirection.magnitude < E;
             bool allowRotation = Mathf.Abs(netRotation) > E;
-            if (netMoveDirection.magnitude > E || Mathf.Abs(netRotation) > E)
+            if (!editorIsActive && (netMoveDirection.magnitude > E || Mathf.Abs(netRotation) > E))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
                 AccelDirection(netMoveDirection, allowOrtho, allowRotation, netMoveDirection.magnitude, netRotation * 10);
