@@ -446,6 +446,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileLookup: {fileID: 11400000, guid: 50f2cdfeb73904843b1d98fdb2a042f7, type: 2}
   ghost: {fileID: 1490490196}
+  deleteSprite: {fileID: 21300000, guid: e282112ad9586194189210eb8257c185, type: 3}
+  deleteColor: {r: 1, g: 0, b: 0, a: 0.5882353}
   ghostInvalidColor: {r: 1, g: 0, b: 0, a: 0.5882353}
   ghostValidColor: {r: 1, g: 1, b: 1, a: 0.5882353}
   ghostOutOfRangeColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
@@ -1501,8 +1503,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 2123079611
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

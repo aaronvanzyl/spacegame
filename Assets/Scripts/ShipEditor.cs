@@ -14,6 +14,9 @@ namespace SpaceGame
         bool selectedTileIsSolid;
         public TileLookupScriptableObject tileLookup;
         public SpriteRenderer ghost;
+        public Sprite deleteSprite;
+        public Color deleteColor;
+        Sprite selectedTileSprite;
         public Color ghostInvalidColor;
         public Color ghostValidColor;
         public Color ghostOutOfRangeColor;
@@ -45,6 +48,7 @@ namespace SpaceGame
             }
             else
             {
+                // Need to rewrite to use input.getbuttondown
                 if (!hasRotated && Mathf.Abs(Input.GetAxis("Rotate")) > 0)
                 {
                     hasRotated = true;
@@ -60,11 +64,21 @@ namespace SpaceGame
                 bool tileEmpty = true;
                 bool tileSupported = false;
                 Ship attachedShip = null;
+                Tile underCursor = null;
                 Vector2Int tilePos = Vector2Int.zero;
+
+                // Determine if tile is support and empty
                 foreach (Ship ship in GameManager.Instance.ships)
                 {
                     tilePos = ship.WorldToTilePos(cursorPos);
-                    if (ship.GetTile(tilePos) == null)
+                    if (ship.TryGetTile(tilePos, out Tile tile))
+                    {
+                        attachedShip = ship;
+                        underCursor = tile;
+                        tileEmpty = false;
+                        break;
+                    }
+                    else
                     {
                         if (ship.TileExists(tilePos - Vector2Int.left)
                             || ship.TileExists(tilePos - Vector2Int.up)
@@ -76,22 +90,21 @@ namespace SpaceGame
                             break;
                         }
                     }
-                    else
-                    {
-                        tileEmpty = false;
-                        break;
-                    }
                 }
 
-                if (!tileSupported)
+                // Set position of ghost and check for partial overlap
+                if (!tileSupported && underCursor == null)
                 {
                     ghost.transform.position = cursorPos;
-                    //ghost.transform.up = GameManager.Instance.localPlayer.transform.up;
                     ghost.transform.up = Vector2.up;
                     if (selectedTile.canRotate)
                     {
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
+                }
+                else if (underCursor != null) {
+                    ghost.transform.position = underCursor.transform.position;
+                    ghost.transform.up = underCursor.transform.up;
                 }
                 else
                 {
@@ -102,19 +115,39 @@ namespace SpaceGame
                         ghost.transform.eulerAngles += new Vector3(0, 0, rotation);
                     }
                     Collider2D[] overlapping = Physics2D.OverlapBoxAll(ghost.transform.position, Vector2.one * 0.95f, ghost.transform.eulerAngles.z);
-                    foreach (Collider2D col in overlapping) {
-                        if (col.TryGetComponent<Tile>(out _) || (selectedTileIsSolid && !col.isTrigger)) {
+                    foreach (Collider2D col in overlapping)
+                    {
+                        if (col.TryGetComponent<Tile>(out _) || (selectedTileIsSolid && !col.isTrigger))
+                        {
                             tileEmpty = false;
                             break;
                         }
                     }
-                    if (tileEmpty && attachedShip == GameManager.Instance.localShip && Input.GetButtonDown("Fire1"))
-                    {
-                        attachedShip.SetTileNetwork(tilePos, selectedTile.canRotate ? rotation : 0, selectedTileIndex);
-                    }
+                    
                 }
 
-                ghost.material.color = (tileSupported && tileEmpty && attachedShip == GameManager.Instance.localShip) ? ghostValidColor : ghostInvalidColor;
+                // Set color and sprite of ghost
+                if (underCursor != null)
+                {
+                    ghost.sprite = deleteSprite;
+                    ghost.material.color = deleteColor;
+                    
+                }
+                else
+                {
+                    ghost.sprite = selectedTileSprite;
+                    ghost.material.color = (tileSupported && tileEmpty && attachedShip == GameManager.Instance.localShip) ? ghostValidColor : ghostInvalidColor;
+                }
+
+                // Check for create/delete
+                if (tileEmpty && tileSupported && attachedShip == GameManager.Instance.localShip && Input.GetButtonDown("Fire1"))
+                {
+                    attachedShip.SetTileNetwork(tilePos, selectedTile.canRotate ? rotation : 0, selectedTileIndex);
+                }
+                else if (underCursor != null && attachedShip == GameManager.Instance.localShip && Input.GetButtonDown("Fire2"))
+                {
+                    attachedShip.DestroyTileNetwork(tilePos);
+                }
             }
         }
 
@@ -125,11 +158,12 @@ namespace SpaceGame
             {
                 selectedTile = tileLookup.tilePrefabs[selectedTileIndex];
                 selectedTileIsSolid = !selectedTile.GetComponent<Collider2D>().isTrigger;
-                ghost.sprite = selectedTile.GetComponent<SpriteRenderer>().sprite;
+                ghost.sprite = selectedTileSprite = selectedTile.GetComponent<SpriteRenderer>().sprite;
             }
         }
 
-        public void ToggleOn(bool isOn) {
+        public void ToggleOn(bool isOn)
+        {
             gameObject.SetActive(isOn);
             ghost.gameObject.SetActive(isOn);
             tileSelectionGroup.gameObject.SetActive(isOn);
