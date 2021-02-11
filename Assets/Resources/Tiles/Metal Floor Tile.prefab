@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 199284011543877520}
   - component: {fileID: 199284011543877523}
-  - component: {fileID: 199284011543877522}
   - component: {fileID: 199284011543877613}
-  - component: {fileID: 9090800027789451499}
+  - component: {fileID: 199284011543877522}
   m_Layer: 0
   m_Name: Metal Floor Tile
   m_TagString: Untagged
@@ -71,7 +70,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1013435615
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 85a44dee6b203da4faa2d050765acbc4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -84,23 +83,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &199284011543877522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 199284011543877612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cf71f33005bbb14196ec6fd5c7b85fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  canRotate: 0
-  ship: {fileID: 0}
-  pos: {x: 0, y: 0}
-  canOccupy: 0
-  isOccupied: 0
 --- !u!61 &199284011543877613
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -127,7 +109,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &9090800027789451499
+--- !u!114 &199284011543877522
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,17 +118,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 199284011543877612}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: 11500000, guid: 6cf71f33005bbb14196ec6fd5c7b85fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  observableSearch: 2
-  Synchronization: 3
-  OwnershipTransfer: 1
-  ObservedComponents:
-  - {fileID: 199284011543877522}
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
+  canRotate: 0
+  tileType: 0
+  ship: {fileID: 0}
+  pos: {x: 0, y: 0}

@@ -5,8 +5,15 @@ using UnityEngine;
 
 namespace SpaceGame
 {
-    public class Thruster : Tile
+    [RequireComponent(typeof(Tile))]
+    public class Thruster : MonoBehaviour, ITileSync
     {
+        public Tile Parent { get => parent; set => parent = value; }
+        Tile parent;
+
+        public bool NeedSync { get => needSync; set => needSync = value; }
+        bool needSync;
+
         public float Activation { 
             get {
                 return activation;
@@ -15,11 +22,12 @@ namespace SpaceGame
                 if (activation != value)
                 {
                     activation = value;
-                    MarkForSync();
+                    needSync = true;
                 }
             } 
         }
         float activation;
+
         public float force;
         public GameObject fireEffect;
 
@@ -31,15 +39,13 @@ namespace SpaceGame
             fireEffect.transform.localPosition = new Vector3(0, -0.5f - Activation * 0.25f, 0);
         }
 
-        public override void Serialize(PhotonStream stream)
+        public void Serialize(PhotonStream stream)
         {
-            base.Serialize(stream);
             stream.SendNext(Activation);
         }
 
-        public override void Deserialize(PhotonStream stream)
+        public void Deserialize(PhotonStream stream)
         {
-            base.Deserialize(stream);
             Activation = (float)stream.ReceiveNext();
         }
     }

@@ -7,27 +7,56 @@ namespace SpaceGame
 {
     public class Tile : MonoBehaviourPunCallbacks
     {
-        public int tileType;
         public bool canRotate;
+
+        [HideInInspector]
+        public int tileType;
         [HideInInspector]
         public Ship ship;
         [HideInInspector]
         public Vector2Int pos;
-        public bool awaitingSync;
 
-        protected void MarkForSync() {
-            if (!awaitingSync) {
-                awaitingSync = true;
-                ship.tileSyncList.Add(this);
+        ITileSync[] syncedComponents;
+
+        private void Awake()
+        {
+            syncedComponents = GetComponentsInChildren<ITileSync>();
+            foreach (ITileSync component in syncedComponents) {
+                component.Parent = this;
             }
         }
 
-        public virtual void Serialize(PhotonStream stream)
-        {
+        public bool NeedSync() {
+            foreach (ITileSync component in syncedComponents) {
+                if (component.NeedSync) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        public virtual void Deserialize(PhotonStream stream) { 
-        
+        public void Serialize(PhotonStream stream)
+        {
+            foreach (ITileSync component in syncedComponents) {
+
+                stream.SendNext(component.NeedSync);
+                if (component.NeedSync)
+                {
+                    component.NeedSync = false;
+                    component.Serialize(stream);
+                }
+            }
+        }
+
+        public void Deserialize(PhotonStream stream) {
+            foreach (ITileSync sync in syncedComponents)
+            {
+                if ((bool)stream.ReceiveNext())
+                {
+                    sync.Deserialize(stream);
+                }
+            }
         }
 
         //public void OnPhotonInstantiate(PhotonMessageInfo info)

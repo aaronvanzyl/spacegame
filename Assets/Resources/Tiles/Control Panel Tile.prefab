@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4358165120112509779}
   - component: {fileID: 4358165120112509778}
   - component: {fileID: 4358165120112509788}
-  - component: {fileID: 4358165120112509789}
   - component: {fileID: 6400987903119186048}
   m_Layer: 0
   m_Name: Control Panel Tile
@@ -110,28 +109,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4358165120112509789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4358165120112509776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  observableSearch: 2
-  Synchronization: 3
-  OwnershipTransfer: 1
-  ObservedComponents: []
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &6400987903119186048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,6 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf71f33005bbb14196ec6fd5c7b85fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileType: 0
   canRotate: 1
   ship: {fileID: 0}
   pos: {x: 0, y: 0}

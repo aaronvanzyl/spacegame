@@ -91,9 +91,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2318569571033114820}
   - component: {fileID: 2318569571033114821}
-  - component: {fileID: 2318569571033114822}
   - component: {fileID: 2318569571033114823}
-  - component: {fileID: 2318569571033116472}
+  - component: {fileID: 2318569571033114822}
+  - component: {fileID: -2137513789840883781}
   m_Layer: 0
   m_Name: Thruster Tile
   m_TagString: Untagged
@@ -166,25 +166,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2318569571033114822
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2318569571033116473}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b35b27095e37d741a6cc2f3c82eba65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tileType: 0
-  canRotate: 1
-  ship: {fileID: 0}
-  pos: {x: 0, y: 0}
-  awaitingSync: 0
-  force: 25
-  fireEffect: {fileID: 393839621}
 --- !u!61 &2318569571033114823
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -211,7 +192,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &2318569571033116472
+--- !u!114 &2318569571033114822
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -220,16 +201,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 2318569571033116473}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b35b27095e37d741a6cc2f3c82eba65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  observableSearch: 2
-  Synchronization: 3
-  OwnershipTransfer: 1
-  ObservedComponents: []
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
+  force: 10
+  fireEffect: {fileID: 393839621}
+--- !u!114 &-2137513789840883781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2318569571033116473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf71f33005bbb14196ec6fd5c7b85fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canRotate: 0
+  tileType: 0
+  ship: {fileID: 0}
+  pos: {x: 0, y: 0}

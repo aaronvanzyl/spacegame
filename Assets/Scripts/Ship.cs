@@ -16,9 +16,6 @@ namespace SpaceGame
         public TileLookupScriptableObject tileLookup;
 
         [HideInInspector]
-        public List<Tile> tileSyncList = new List<Tile>();
-
-        [HideInInspector]
         public Rigidbody2D rb2d;
 
         Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
@@ -92,20 +89,19 @@ namespace SpaceGame
         {
             if (stream.IsWriting)
             {
-                stream.SendNext(tileSyncList.Count);
-                foreach (Tile tile in tileSyncList)
+                foreach (Tile tile in tiles.Values)
                 {
+                    stream.SendNext(true);
                     stream.SendNext(tile.pos.x);
                     stream.SendNext(tile.pos.y);
                     tile.Serialize(stream);
-                    tile.awaitingSync = false;
                 }
-                tileSyncList.Clear();
+                stream.SendNext(false);
+
             }
             else
             {
-                int changedTileCount = (int)stream.ReceiveNext();
-                for (int i = 0; i < changedTileCount; i++)
+                while ((bool)stream.ReceiveNext())
                 {
                     Vector2Int pos = new Vector2Int();
                     pos.x = (int)stream.ReceiveNext();
@@ -138,7 +134,7 @@ namespace SpaceGame
             rb2d.mass += 1;
 
             // Update lists
-            if (tile is Thruster thruster)
+            if (tile.TryGetComponent(out Thruster thruster))
             {
                 thrusters.Add(thruster);
             }
@@ -166,7 +162,8 @@ namespace SpaceGame
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
-            if (newPlayer == PhotonNetwork.LocalPlayer) {
+            if (newPlayer == PhotonNetwork.LocalPlayer)
+            {
                 return;
             }
             foreach (KeyValuePair<Vector2Int, Tile> pair in tiles)
@@ -198,7 +195,7 @@ namespace SpaceGame
             rb2d.mass -= 1;
 
             // Update lists
-            if (tile is Thruster thruster)
+            if (tile.TryGetComponent(out Thruster thruster))
             {
                 thrusters.Remove(thruster);
             }
@@ -305,7 +302,7 @@ namespace SpaceGame
 
         float GetTorque(Thruster t)
         {
-            Vector2 r = t.pos - rb2d.centerOfMass;
+            Vector2 r = t.Parent.pos - rb2d.centerOfMass;
             Vector3 localForce = transform.InverseTransformDirection(t.transform.up) * t.force;
             float torque = Vector3.Cross(r, localForce).z;
 

@@ -52,7 +52,6 @@ MonoBehaviour:
   debugLabel: {fileID: 6158653993435396036}
   centerTileType: 0
   tileLookup: {fileID: 11400000, guid: 50f2cdfeb73904843b1d98fdb2a042f7, type: 2}
-  tileSyncList: []
   rb2d: {fileID: 0}
   editorIsActive: 0
 --- !u!50 &6158653992312540917
