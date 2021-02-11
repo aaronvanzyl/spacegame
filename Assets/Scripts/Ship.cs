@@ -10,6 +10,8 @@ namespace SpaceGame
     [RequireComponent(typeof(Rigidbody))]
     public class Ship : MonoBehaviourPunCallbacks, IPunObservable
     {
+        
+
         public float moveForce;
         public Text debugLabel;
         public int centerTileType;
@@ -17,6 +19,8 @@ namespace SpaceGame
 
         [HideInInspector]
         public Rigidbody2D rb2d;
+        [HideInInspector]
+        public int team;
 
         Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
         List<Thruster> thrusters = new List<Thruster>();
@@ -35,7 +39,7 @@ namespace SpaceGame
 
         void Start()
         {
-
+            team = photonView.ViewID;
             rb2d.centerOfMass = Vector2.zero;
             if (photonView.IsMine)
             {
@@ -87,26 +91,9 @@ namespace SpaceGame
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            if (stream.IsWriting)
-            {
-                foreach (Tile tile in tiles.Values)
-                {
-                    stream.SendNext(true);
-                    stream.SendNext(tile.pos.x);
-                    stream.SendNext(tile.pos.y);
-                    tile.Serialize(stream);
-                }
-                stream.SendNext(false);
-
-            }
-            else
-            {
-                while ((bool)stream.ReceiveNext())
-                {
-                    Vector2Int pos = new Vector2Int();
-                    pos.x = (int)stream.ReceiveNext();
-                    pos.y = (int)stream.ReceiveNext();
-                    tiles[pos].Deserialize(stream);
+            foreach (Tile tile in tiles.Values) {
+                if (tile.HasSyncedComponents()) {
+                    tile.OnPhotonSerializeView(stream, info);
                 }
             }
         }
@@ -302,7 +289,7 @@ namespace SpaceGame
 
         float GetTorque(Thruster t)
         {
-            Vector2 r = t.Parent.pos - rb2d.centerOfMass;
+            Vector2 r = t.tile.pos - rb2d.centerOfMass;
             Vector3 localForce = transform.InverseTransformDirection(t.transform.up) * t.force;
             float torque = Vector3.Cross(r, localForce).z;
 

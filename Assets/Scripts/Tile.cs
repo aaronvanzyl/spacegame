@@ -16,47 +16,49 @@ namespace SpaceGame
         [HideInInspector]
         public Vector2Int pos;
 
-        ITileSync[] syncedComponents;
+        IPunObservable[] syncedComponents;
 
         private void Awake()
         {
-            syncedComponents = GetComponentsInChildren<ITileSync>();
-            foreach (ITileSync component in syncedComponents) {
-                component.Parent = this;
-            }
+            syncedComponents = GetComponentsInChildren<IPunObservable>();
         }
 
-        public bool NeedSync() {
-            foreach (ITileSync component in syncedComponents) {
-                if (component.NeedSync) {
-                    return true;
-                }
-            }
-
-            return false;
+        public bool HasSyncedComponents() {
+            return syncedComponents.Length > 0;
         }
 
-        public void Serialize(PhotonStream stream)
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-            foreach (ITileSync component in syncedComponents) {
-
-                stream.SendNext(component.NeedSync);
-                if (component.NeedSync)
-                {
-                    component.NeedSync = false;
-                    component.Serialize(stream);
-                }
+            foreach (IPunObservable component in syncedComponents)
+            {
+                component.OnPhotonSerializeView(stream, info);
+                //stream.SendNext(component.NeedSync);
+                //if (component.NeedSync)
+                //{
+                //    component.NeedSync = false;
+                    
+                //}
             }
+            //if (stream.IsWriting)
+            //{
+                
+
+            //}
+            //else
+            //{
+            //    foreach (ITileSync sync in syncedComponents)
+            //    {
+            //        if ((bool)stream.ReceiveNext())
+            //        {
+            //            sync.Deserialize(stream);
+            //        }
+            //    }
+            //}
+        //}
         }
 
-        public void Deserialize(PhotonStream stream) {
-            foreach (ITileSync sync in syncedComponents)
-            {
-                if ((bool)stream.ReceiveNext())
-                {
-                    sync.Deserialize(stream);
-                }
-            }
+        public void NetworkDestroy() {
+            ship.DestroyTileNetwork(pos);
         }
 
         //public void OnPhotonInstantiate(PhotonMessageInfo info)
