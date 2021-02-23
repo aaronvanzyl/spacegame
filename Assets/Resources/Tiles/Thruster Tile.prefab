@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tile: {fileID: 0}
-  force: 10
+  force: 3
   fireEffect: {fileID: 393839621}
 --- !u!114 &-2137513789840883781
 MonoBehaviour:
@@ -237,7 +237,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 10
-  localDestroyOnDeath: 0
+  forceCollisionDamage: 0.5
+  flatCollisionDamage: 0
+  destroyOnDeath: 0
   onDeath:
     m_PersistentCalls:
       m_Calls:

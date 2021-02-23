@@ -10,12 +10,11 @@ namespace SpaceGame
     [RequireComponent(typeof(Rigidbody))]
     public class Ship : MonoBehaviourPunCallbacks, IPunObservable
     {
-        
-
         public float moveForce;
         public Text debugLabel;
         public int centerTileType;
         public TileLookupScriptableObject tileLookup;
+        public bool editorIsActive;
 
         [HideInInspector]
         public Rigidbody2D rb2d;
@@ -24,17 +23,19 @@ namespace SpaceGame
 
         Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
         List<Thruster> thrusters = new List<Thruster>();
-        ShipController controller;
+        Vector2 moveTarget = Vector2.zero;
+        bool hasMoveTarget = false;
+        Vector2 rotateTarget = Vector2.zero;
+        bool hasRotateTarget = false;
 
         const float E = 0.001f;
         const float rotationTolerance = 0.01f;
 
-        public bool editorIsActive;
+        
 
         void Awake()
         {
             rb2d = GetComponent<Rigidbody2D>();
-            controller = GetComponent<ShipController>();
         }
 
         void Start()
@@ -61,15 +62,26 @@ namespace SpaceGame
                 return;
             }
 
-            Vector2 netMoveDirection = controller.moveDirection;
-            float netRotation = controller.rotation;
+            if (Vector2.Distance(transform.position, moveTarget) < 3f) {
+                hasMoveTarget = false;
+            }
+            if (Vector2.Distance(transform.position, rotateTarget) < 3f)
+            {
+                hasRotateTarget = false;
+            }
 
-            bool allowOrtho = netMoveDirection.magnitude < E;
-            bool allowRotation = Mathf.Abs(netRotation) > E;
-            if (!editorIsActive && (netMoveDirection.magnitude > E || Mathf.Abs(netRotation) > E))
+            Vector2 relativeMoveDirection = (moveTarget - (Vector2)transform.position).normalized;
+            Vector2 relativeRotateVector = (rotateTarget - (Vector2)transform.position).normalized;
+
+            float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
+            relativeRotation -= rb2d.angularVelocity * 0.1f;
+
+            bool allowOrtho = hasRotateTarget;
+            bool allowRotation = hasRotateTarget;
+            if (!editorIsActive && (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f)))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
-                AccelDirection(netMoveDirection, allowOrtho, allowRotation, netMoveDirection.magnitude, netRotation * 10);
+                AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
                 //float netTorque = 0;
                 //foreach (Thruster t in thrusters)
                 //{
@@ -91,6 +103,7 @@ namespace SpaceGame
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
+
             foreach (Tile tile in tiles.Values) {
                 if (tile.HasSyncedComponents()) {
                     tile.OnPhotonSerializeView(stream, info);
@@ -306,6 +319,20 @@ namespace SpaceGame
         public void ApplyThrusterForce(Thruster t)
         {
             rb2d.AddForceAtPosition(t.transform.up * t.force * t.Activation * Time.fixedDeltaTime, t.transform.position, ForceMode2D.Impulse);
+        }
+
+        [PunRPC]
+        public void SetMoveTarget(Vector2 target)
+        {
+            moveTarget = target;
+            hasMoveTarget = true;
+        }
+
+        [PunRPC]
+        public void SetRotateTarget(Vector2 target)
+        {
+            rotateTarget = target;
+            hasRotateTarget = true;
         }
     }
 

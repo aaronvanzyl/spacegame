@@ -2,32 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+namespace SpaceGame
 {
-    public float speed;
-    public float damage;
-
-    [HideInInspector]
-    public Vector2 direction = Vector2.up;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Projectile : MonoBehaviour
     {
-        
-    }
+        public float speed;
+        public float damage;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        [HideInInspector]
+        public Vector2 direction = Vector2.up;
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if(other.TryGetComponent(out HitBox hitbox))
+        // Start is called before the first frame update
+        void Start()
         {
-            hitbox.ReceiveDamage(damage);
+
         }
-        //if(other.TryGetComponent)
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.TryGetComponent(out HitBox hitbox))
+            {
+                hitbox.ReceiveDamage(damage);
+            }
+            //if(other.TryGetComponent)
+        }
     }
 }

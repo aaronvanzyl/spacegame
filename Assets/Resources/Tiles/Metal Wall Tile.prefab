@@ -139,7 +139,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 10
-  localDestroyOnDeath: 0
+  forceCollisionDamage: 0.5
+  flatCollisionDamage: 0
+  destroyOnDeath: 0
   onDeath:
     m_PersistentCalls:
       m_Calls:

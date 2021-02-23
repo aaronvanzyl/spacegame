@@ -28,7 +28,7 @@ namespace SpaceGame
             }
         }
         float activation;
-
+        [HideInInspector]
         public Tile tile;
         public float force;
         public GameObject fireEffect;
