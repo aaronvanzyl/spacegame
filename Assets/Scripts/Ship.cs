@@ -73,6 +73,11 @@ namespace SpaceGame
             Vector2 relativeMoveDirection = (moveTarget - (Vector2)transform.position).normalized;
             Vector2 relativeRotateVector = (rotateTarget - (Vector2)transform.position).normalized;
 
+            //interceptVelocity(Vector2 projectileAcc, Vector2 targetAcc, Vector2 targetVelocity, Vector2 dist, double projectileSpeed)
+            Vector2 relativeVelocity = -rb2d.velocity; // velocity of the target as seen from the ship: velocity of target (none) - velocity of ship
+            Vector2 chaseVector = Chase.interceptVelocity(Vector2.zero, Vector2.zero, relativeVelocity, relativeMoveDirection, 500000f/*rb2d.velocity.magnitude*/);
+            chaseVector = chaseVector.normalized;
+
             float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
             relativeRotation -= rb2d.angularVelocity * 0.1f;
 
@@ -81,7 +86,8 @@ namespace SpaceGame
             if (!editorIsActive && (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f)))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
-                AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
+                //AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
+                AccelDirection(chaseVector, allowOrtho, allowRotation, 1, Mathf.Atan2(chaseVector.normalized.y, chaseVector.normalized.x));
                 //float netTorque = 0;
                 //foreach (Thruster t in thrusters)
                 //{
