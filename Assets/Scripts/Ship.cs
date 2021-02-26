@@ -86,8 +86,8 @@ namespace SpaceGame
             if (!editorIsActive && (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f)))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
-                //AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
-                AccelDirection(chaseVector, allowOrtho, allowRotation, 1, Mathf.Atan2(chaseVector.normalized.y, chaseVector.normalized.x));
+                AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
+                //AccelDirection(chaseVector, allowOrtho, allowRotation, 1, Vector2.SignedAngle(transform.up, chaseVector));
                 //float netTorque = 0;
                 //foreach (Thruster t in thrusters)
                 //{
