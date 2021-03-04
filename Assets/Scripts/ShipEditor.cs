@@ -9,6 +9,8 @@ namespace SpaceGame
 {
     public class ShipEditor : MonoBehaviour
     {
+        [HideInInspector]
+        public Ship selectedShip;
         int selectedTileIndex = -1;
         Tile selectedTile;
         bool selectedTileIsSolid;
@@ -136,15 +138,15 @@ namespace SpaceGame
                 else
                 {
                     ghost.sprite = selectedTileSprite;
-                    ghost.material.color = (tileSupported && tileEmpty && attachedShip == GameManager.Instance.localShip) ? ghostValidColor : ghostInvalidColor;
+                    ghost.material.color = (tileSupported && tileEmpty && attachedShip == selectedShip) ? ghostValidColor : ghostInvalidColor;
                 }
 
                 // Check for create/delete
-                if (tileEmpty && tileSupported && attachedShip == GameManager.Instance.localShip && Input.GetButtonDown("Fire1"))
+                if (tileEmpty && tileSupported && attachedShip == selectedShip && Input.GetButtonDown("Fire1"))
                 {
                     attachedShip.SetTileNetwork(tilePos, selectedTile.canRotate ? rotation : 0, selectedTileIndex);
                 }
-                else if (underCursor != null && attachedShip == GameManager.Instance.localShip && Input.GetButtonDown("Fire2"))
+                else if (underCursor != null && attachedShip == selectedShip && Input.GetButtonDown("Fire2"))
                 {
                     attachedShip.DestroyTileNetwork(tilePos);
                 }
@@ -167,7 +169,6 @@ namespace SpaceGame
             gameObject.SetActive(isOn);
             ghost.gameObject.SetActive(isOn);
             tileSelectionGroup.gameObject.SetActive(isOn);
-            GameManager.Instance.localShip.editorIsActive = isOn;
         }
     }
 }

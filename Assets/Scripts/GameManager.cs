@@ -12,8 +12,6 @@ namespace SpaceGame
     {
         public static GameManager Instance;
         [HideInInspector]
-        public Ship localShip;
-        [HideInInspector]
         public List<Ship> ships;
         public Ship shipPrefab;
 
@@ -21,7 +19,9 @@ namespace SpaceGame
         {
             Instance = this;
             Vector2 pos = Random.insideUnitCircle * 10;
-            localShip = PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity).GetComponent<Ship>();
+            Ship localShip = PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity).GetComponent<Ship>();
+            localShip.photonView.TransferOwnership(PhotonNetwork.MasterClient);
+            FindObjectOfType<Controller>().SelectShip(localShip);
 
         }
 

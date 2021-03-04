@@ -7,7 +7,8 @@ namespace SpaceGame
 {
     public class Controller : MonoBehaviour
     {
-
+        public CameraController camController;
+        public ShipEditor editor;
         public GameObject moveMarker;
         public GameObject rotateMarker;
 
@@ -20,25 +21,39 @@ namespace SpaceGame
 
         void Start()
         {
-            selectedShip = GameManager.Instance.localShip;
         }
 
         void Update()
         {
-            //moveDirection = Vector2.zero;
-            if (Input.GetButton("Fire2"))
+            Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (!editor.isActiveAndEnabled)
             {
-                Vector2 cursorPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (Input.GetButtonDown("Fire1"))
                 {
-                    rotateMarker.transform.position = cursorPos;
-                    selectedShip.photonView.RPC("SetRotateTarget", selectedShip.photonView.Owner, cursorPos);
+                    Collider2D[] overlap = Physics2D.OverlapPointAll(cursorPos);
+                    foreach (Collider2D col in overlap)
+                    {
+                        if (col.TryGetComponent(out Tile tile))
+                        {
+                            SelectShip(tile.ship);
+                        }
+                    }
                 }
-                else {
-                    rotateMarker.transform.position = cursorPos;
-                    selectedShip.photonView.RPC("SetRotateTarget", selectedShip.photonView.Owner, cursorPos);
-                    moveMarker.transform.position = cursorPos;
-                    selectedShip.photonView.RPC("SetMoveTarget", selectedShip.photonView.Owner, cursorPos);
+                //moveDirection = Vector2.zero;
+                if (Input.GetButton("Fire2"))
+                {
+                    if (Input.GetKey(KeyCode.LeftShift))
+                    {
+                        rotateMarker.transform.position = cursorPos;
+                        selectedShip.photonView.RPC("SetRotateTarget", selectedShip.photonView.Owner, cursorPos);
+                    }
+                    else
+                    {
+                        rotateMarker.transform.position = cursorPos;
+                        selectedShip.photonView.RPC("SetRotateTarget", selectedShip.photonView.Owner, cursorPos);
+                        moveMarker.transform.position = cursorPos;
+                        selectedShip.photonView.RPC("SetMoveTarget", selectedShip.photonView.Owner, cursorPos);
+                    }
                 }
             }
             //else
@@ -52,5 +67,13 @@ namespace SpaceGame
             //rotation = Input.GetAxis("Rotate");
         }
 
+        public void SelectShip(Ship ship)
+        {
+            selectedShip = ship;
+            editor.selectedShip = ship;
+            camController.SetFollowTarget(ship.transform);
+            moveMarker.transform.position = ship.GetMoveTarget();
+            rotateMarker.transform.position = ship.GetRotateTarget();
+        }
     }
 }

@@ -444,6 +444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59df1a5e5026c10469533357c67ee8c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectedShip: {fileID: 0}
   tileLookup: {fileID: 11400000, guid: 50f2cdfeb73904843b1d98fdb2a042f7, type: 2}
   ghost: {fileID: 1490490196}
   deleteSprite: {fileID: 21300000, guid: e282112ad9586194189210eb8257c185, type: 3}
@@ -497,8 +498,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 684cc8b752a393241b097e7304544b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camController: {fileID: 329441329}
+  editor: {fileID: 469054929}
   moveMarker: {fileID: 2059339520}
   rotateMarker: {fileID: 848413388}
+  selectedShip: {fileID: 0}
   moveDirection: {x: 0, y: 0}
   rotation: 0
 --- !u!4 &594348896
@@ -1484,7 +1488,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe3fd16f7c37cde499402e8c11989145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localShip: {fileID: 0}
   ships: []
   shipPrefab: {fileID: 6158653992312540916, guid: 639ef908c71cb2646849981ba40bcb89,
     type: 3}

@@ -10,6 +10,8 @@ namespace SpaceGame
         public float minSize;
         public float maxSize;
 
+        Transform follow;
+
         Camera cam;
         Vector2 offset;
         bool mouseDownLastFrame;
@@ -19,6 +21,7 @@ namespace SpaceGame
         {
             cam = GetComponent<Camera>();
         }
+
         void Update()
         {
             bool mouseDown = Input.GetMouseButton(2);
@@ -27,8 +30,14 @@ namespace SpaceGame
                 offset -= (Vector2)cam.ScreenToWorldPoint(mousePos) - (Vector2)cam.ScreenToWorldPoint(mousePosLastFrame);
             }
 
-            Vector3 playerPos = GameManager.Instance.localShip.transform.position;
-            transform.position = new Vector3(playerPos.x, playerPos.y, transform.position.z) + (Vector3)offset;
+            if (follow == null)
+            {
+                transform.position = new Vector3(offset.x, offset.y, transform.position.z);
+            }
+            else {
+                transform.position = new Vector3(follow.position.x, follow.position.y, transform.position.z) + (Vector3)offset;
+            }
+            
             cam.orthographicSize -= Input.mouseScrollDelta.y;
             cam.orthographicSize = Mathf.Clamp(cam.orthographicSize, minSize, maxSize);
             //Vector3 eulerAngles = transform.eulerAngles;
@@ -36,6 +45,11 @@ namespace SpaceGame
             //transform.eulerAngles = eulerAngles;
             mouseDownLastFrame = mouseDown;
             mousePosLastFrame = mousePos;
+        }
+
+        public void SetFollowTarget(Transform target) {
+            follow = target;
+            offset = Vector2.zero;
         }
     }
 }

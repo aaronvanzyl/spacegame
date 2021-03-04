@@ -14,7 +14,6 @@ namespace SpaceGame
         public Text debugLabel;
         public int centerTileType;
         public TileLookupScriptableObject tileLookup;
-        public bool editorIsActive;
 
         [HideInInspector]
         public Rigidbody2D rb2d;
@@ -75,7 +74,7 @@ namespace SpaceGame
 
             //interceptVelocity(Vector2 projectileAcc, Vector2 targetAcc, Vector2 targetVelocity, Vector2 dist, double projectileSpeed)
             Vector2 relativeVelocity = -rb2d.velocity; // velocity of the target as seen from the ship: velocity of target (none) - velocity of ship
-            Vector2 chaseVector = Chase.interceptVelocity(Vector2.zero, Vector2.zero, relativeVelocity, (moveTarget - (Vector2)transform.position), 500000f/*rb2d.velocity.magnitude*/); // const until velocity thresh then vel? tune? different up down gates?
+            Vector2 chaseVector = Chase.interceptVelocity(Vector2.zero, Vector2.zero, relativeVelocity, relativeMoveDirection, 500f/*rb2d.velocity.magnitude*/);
             chaseVector = chaseVector.normalized;
 
             float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
@@ -83,7 +82,7 @@ namespace SpaceGame
 
             bool allowOrtho = hasRotateTarget;
             bool allowRotation = hasRotateTarget;
-            if (!editorIsActive && (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f)))
+            if (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
                 AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
@@ -334,11 +333,21 @@ namespace SpaceGame
             hasMoveTarget = true;
         }
 
+        public Vector2 GetMoveTarget()
+        {
+            return moveTarget;
+        }
+
         [PunRPC]
         public void SetRotateTarget(Vector2 target)
         {
             rotateTarget = target;
             hasRotateTarget = true;
+        }
+
+        public Vector2 GetRotateTarget()
+        {
+            return moveTarget;
         }
     }
 
