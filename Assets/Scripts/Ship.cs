@@ -80,21 +80,23 @@ namespace SpaceGame
             //chaseVector = chaseVector.normalized;
 
             double acc = AccelDirection(transform.up, false, false, 1, 0).Sum() / rb2d.mass; // TODO: should only call this when a tile is added
-            double chaseAngle = Chase.interceptAngle(acc, relativeVelocity, (moveTarget - (Vector2)transform.position));
+            double chaseAngle = relativeMoveDirection.y > 0 ? 1 : -1 * Chase.interceptAngle(acc, relativeVelocity, (moveTarget - (Vector2)transform.position));
             Vector2 chaseVec = new Vector2((float)Math.Cos(chaseAngle), (float)Math.Sin(chaseAngle)).normalized;
 
-            float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
+            //float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
+            float relativeRotation = Vector2.SignedAngle(transform.up, chaseVec);
             relativeRotation -= rb2d.angularVelocity * 0.1f;
             float accelMult = 1;
 
 
             bool allowOrtho = hasRotateTarget;
             bool allowRotation = hasRotateTarget;
+            Debug.DrawRay(transform.position, chaseVec, Color.red);
             if (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
                 //double[] result = AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
-                double[] result = AccelDirection(chaseVec, allowOrtho, allowRotation, 1, (float)(chaseAngle * 180/Math.PI));
+                double[] result = AccelDirection(chaseVec, allowOrtho, allowRotation, 1, relativeRotation * 10);
 
                 if (result != null)
                 {
