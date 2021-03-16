@@ -43,5 +43,10 @@ namespace SpaceGame
             Vector2 travel = dist + targetVelocity * (float)t + (targetAcc / 2.0f) * (float)Math.Pow(t, 2);
             return travel / (float)t - (projectileAcc / 2.0f) * (float)t;
         }
+
+        public static double interceptAngle(double projectileAcc, Vector2 targetVelocity, Vector2 dist)
+        {
+            return Math.Acos(1.0 / (-((projectileAcc*(dist.x*dist.x - 2*dist.x*dist.y + dist.y*dist.y)) / (-2*targetVelocity.x *targetVelocity.x *dist.y + 2*dist.x *targetVelocity.x *targetVelocity.y + 2*targetVelocity.x *dist.y *targetVelocity.y - 2*dist.x *targetVelocity.y *targetVelocity.y))));
+        }
     }
 }

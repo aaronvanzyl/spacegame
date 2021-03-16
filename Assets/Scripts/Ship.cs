@@ -1,7 +1,9 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -71,18 +73,47 @@ namespace SpaceGame
 
             //interceptVelocity(Vector2 projectileAcc, Vector2 targetAcc, Vector2 targetVelocity, Vector2 dist, double projectileSpeed)
             Vector2 relativeVelocity = -rb2d.velocity; // velocity of the target as seen from the ship: velocity of target (none) - velocity of ship
-            Vector2 chaseVector = Chase.interceptVelocity(Vector2.zero, Vector2.zero, relativeVelocity, relativeMoveDirection, 500f/*rb2d.velocity.magnitude*/);
-            chaseVector = chaseVector.normalized;
+            //Vector2 chaseVector = Chase.interceptVelocity(Vector2.zero, Vector2.zero, relativeVelocity, relativeMoveDirection, 500f/*rb2d.velocity.magnitude*/);
+            //chaseVector = chaseVector.normalized;
 
-            float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
+            double acc = AccelDirection(transform.up, false, false, 1, 0).Sum() / rb2d.mass; // TODO: should only call this when a tile is added
+            double chaseAngle = relativeMoveDirection.y > 0 ? 1 : -1 * Chase.interceptAngle(acc, relativeVelocity, (moveTarget - (Vector2)transform.position));
+            Vector2 chaseVec = new Vector2((float)Math.Cos(chaseAngle), (float)Math.Sin(chaseAngle)).normalized;
+
+            //float relativeRotation = Vector2.SignedAngle(transform.up, relativeRotateVector);
+            float relativeRotation = Vector2.SignedAngle(transform.up, chaseVec);
             relativeRotation -= rb2d.angularVelocity * 0.1f;
+            float accelMult = 1;
+
 
             bool allowOrtho = hasRotateTarget;
             bool allowRotation = hasRotateTarget;
+            Debug.DrawRay(transform.position, chaseVec, Color.red);
             if (hasMoveTarget || (hasRotateTarget && Mathf.Abs(relativeRotation) > 5f))
             {
                 //Debug.Log(netMoveDirection + " " + netRotation + " " + allowOrtho + " " + allowRotation);
-                AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
+                //double[] result = AccelDirection(relativeMoveDirection, allowOrtho, allowRotation, 1, relativeRotation * 10);
+                double[] result = AccelDirection(chaseVec, allowOrtho, allowRotation, 1, relativeRotation * 10);
+
+                if (result != null)
+                {
+                    for (int i = 0; i < thrusters.Count; i++)
+                    {
+                        thrusters[i].Activation = (float)result[i] * accelMult;
+                    }
+                    //print("Found solution!");
+                }
+                else
+                {
+                    //print("No satisfying result");
+                    for (int i = 0; i < thrusters.Count; i++)
+                    {
+
+                        thrusters[i].Activation = 0;
+                    }
+
+                }
+
                 //AccelDirection(chaseVector, allowOrtho, allowRotation, 1, Vector2.SignedAngle(transform.up, chaseVector));
                 //float netTorque = 0;
                 //foreach (Thruster t in thrusters)
@@ -286,7 +317,7 @@ namespace SpaceGame
             return tilePos;
         }
 
-        public void AccelDirection(Vector2 dir, bool allowOrtho, bool allowRotate, float moveWeight, float rotateWeight, float accelMult = 1)
+        public double[] AccelDirection(Vector2 dir, bool allowOrtho, bool allowRotate, float moveWeight, float rotateWeight)
         {
             dir = dir.normalized;
             int numVars = thrusters.Count;
@@ -354,24 +385,7 @@ namespace SpaceGame
 
             SimplexSolver solver = new SimplexSolver(lhs, rhs, objective);
             double[] result = solver.Solve();
-            if (result != null)
-            {
-                for (int i = 0; i < thrusters.Count; i++)
-                {
-                    thrusters[i].Activation = (float)result[i] * accelMult;
-                }
-                //print("Found solution!");
-            }
-            else
-            {
-                //print("No satisfying result");
-                for (int i = 0; i < thrusters.Count; i++)
-                {
-
-                    thrusters[i].Activation = 0;
-                }
-
-            }
+            return result;
         }
 
         float GetTorque(Thruster t)
