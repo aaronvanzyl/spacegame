@@ -20,7 +20,8 @@ namespace SpaceGame
         [HideInInspector]
         public int team;
 
-        Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
+        [HideInInspector]
+        public Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
         List<Thruster> thrusters = new List<Thruster>();
         Vector2 moveTarget = Vector2.zero;
         bool hasMoveTarget = false;
@@ -30,8 +31,9 @@ namespace SpaceGame
         const float E = 0.001f;
         const float rotationTolerance = 0.01f;
 
-        
+        Vector2Int[] tileDirs = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
+        
         void Awake()
         {
             rb2d = GetComponent<Rigidbody2D>();
@@ -40,11 +42,6 @@ namespace SpaceGame
         void Start()
         {
             team = photonView.ViewID;
-            rb2d.centerOfMass = Vector2.zero;
-            if (photonView.IsMine)
-            {
-                SetTileNetwork(Vector2Int.zero, 0, centerTileType);
-            }
             GameManager.Instance.ships.Add(this);
         }
 
@@ -120,14 +117,19 @@ namespace SpaceGame
         [PunRPC]
         void SetTileRPC(int x, int y, float rotation, int tileType)
         {
+            // Create tile
+            Tile tile = Instantiate(tileLookup.tilePrefabs[tileType], transform).GetComponent<Tile>();
+            AttachTile(x, y, rotation, tile);
+        }
+
+        void AttachTile(int x, int y, float rotation, Tile tile) {
             Vector2Int pos = new Vector2Int(x, y);
             if (tiles.TryGetValue(pos, out Tile existing))
             {
                 DestroyTile(existing);
             }
 
-            // Create tile
-            Tile tile = Instantiate(tileLookup.tilePrefabs[tileType], transform).GetComponent<Tile>();
+            tile.transform.parent = transform;
             tile.transform.localPosition = (Vector2)pos;
             tile.pos = pos;
             tile.transform.localEulerAngles = new Vector3(0, 0, rotation);
@@ -152,6 +154,16 @@ namespace SpaceGame
             if (tiles.TryGetValue(pos, out Tile existing))
             {
                 DestroyTile(existing);
+            }
+        }
+
+        [PunRPC]
+        void MoveTilesRPC(Vector2Int[] posList, int targetID) {
+            Ship target = PhotonNetwork.GetPhotonView(targetID).GetComponent<Ship>();
+            foreach (Vector2Int pos in posList) {
+                Tile tile = tiles[pos];
+                DetachTile(tile);
+                target.AttachTile(pos.x, pos.y, tile.transform.localEulerAngles.z, tile);
             }
         }
 
@@ -195,6 +207,14 @@ namespace SpaceGame
 
         public void DestroyTile(Tile tile)
         {
+            DetachTile(tile);
+            Destroy(tile.gameObject);
+
+            AttemptSplit();
+        }
+
+        public void DetachTile(Tile tile)
+        {
             // Update CoM
             rb2d.centerOfMass = (rb2d.mass * rb2d.centerOfMass - (Vector2)tile.pos) / (rb2d.mass - 1);
             rb2d.mass -= 1;
@@ -205,9 +225,58 @@ namespace SpaceGame
                 thrusters.Remove(thruster);
             }
 
-            // Destroy tile
             tiles.Remove(tile.pos);
-            Destroy(tile.gameObject);
+            tile.ship = null;
+        }
+
+        void Print<T>(List<T> list) {
+            string s = "";
+            foreach (object o in list) {
+                s += o;
+            }
+            Debug.Log(s);
+
+        }
+
+        public void AttemptSplit () {
+            List<List<Vector2Int>> SCCs = FindSCCs();
+
+            Debug.Log("SCCs: " + SCCs.Count);
+            for (int i = 1; i < SCCs.Count; i++) {
+                Print(SCCs[i]);
+                Ship newShip = GameManager.Instance.InstantiateEmptyShip(transform.position, transform.rotation);
+                MoveTilesRPC(SCCs[i].ToArray(), newShip.photonView.ViewID);
+            }
+
+        }
+
+        public List<List<Vector2Int>> FindSCCs() {
+            List<List<Vector2Int>> SCCs = new List<List<Vector2Int>>();
+            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            foreach (Tile tile in tiles.Values) {
+                if (!visited.Contains(tile.pos)) {
+                    List<Vector2Int> scc = new List<Vector2Int>();
+                    Queue<Vector2Int> edge = new Queue<Vector2Int>();
+                    edge.Enqueue(tile.pos);
+                    visited.Add(tile.pos);
+                    scc.Add(tile.pos);
+                    while (edge.Count > 0)
+                    {
+                        Vector2Int edgePos = edge.Dequeue();
+                        foreach (Vector2Int dir in tileDirs)
+                        {
+                            if (TileExists(edgePos + dir) && !visited.Contains(edgePos + dir))
+                            {
+                                edge.Enqueue(edgePos + dir);
+                                visited.Add(edgePos + dir);
+                                scc.Add(edgePos + dir);
+                            }
+                        }
+                    }
+                    SCCs.Add(scc);
+                }
+            }
+            return SCCs;
         }
 
         public Vector2Int WorldToTilePos(Vector3 worldPos)

@@ -19,10 +19,16 @@ namespace SpaceGame
         {
             Instance = this;
             Vector2 pos = Random.insideUnitCircle * 10;
-            Ship localShip = PhotonNetwork.Instantiate(shipPrefab.name, pos, Quaternion.identity).GetComponent<Ship>();
-            localShip.photonView.TransferOwnership(PhotonNetwork.MasterClient);
+            Ship localShip = InstantiateEmptyShip(pos, Quaternion.identity);
+            localShip.SetTileNetwork(Vector2Int.zero, 0, localShip.centerTileType);
             FindObjectOfType<Controller>().SelectShip(localShip);
 
+        }
+
+        public Ship InstantiateEmptyShip(Vector2 pos, Quaternion rotation) {
+            Ship ship = PhotonNetwork.Instantiate(shipPrefab.name, pos, rotation).GetComponent<Ship>();
+            ship.photonView.TransferOwnership(PhotonNetwork.MasterClient);
+            return ship;
         }
 
         #region Photon Callbacks
