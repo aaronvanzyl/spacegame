@@ -19,7 +19,6 @@ namespace SpaceGame
 
         [HideInInspector]
         public Rigidbody2D rb2d;
-        [HideInInspector]
         public int teamID;
 
         [HideInInspector]
@@ -36,6 +35,8 @@ namespace SpaceGame
         Vector2Int[] tileDirs = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
         const int DELIMITER = int.MinValue + 1;
+
+        public bool selected;
 
 
         void Awake()
@@ -55,7 +56,14 @@ namespace SpaceGame
             {
                 foreach (Tile tile in tiles.Values)
                 {
-                    //tile.GetComponent<SpriteRenderer>().color = team.color;
+
+                    Color col = team.color;
+                    if (!selected)
+                    {
+                        col *= 0.7f;
+                        col.a = 1f;
+                    }
+                    tile.outline.color = col;
                 }
             }
             //debugLabel.text = photonView.Owner.ActorNumber + " " + controller.photonView.Owner.ActorNumber;

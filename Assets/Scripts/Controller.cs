@@ -35,7 +35,10 @@ namespace SpaceGame
                     {
                         if (col.TryGetComponent(out Tile tile))
                         {
-                            SelectShip(tile.ship);
+                            if (tile.ship.teamID == GameManager.Instance.localTeamID)
+                            {
+                                SelectShip(tile.ship);
+                            }
                         }
                     }
                 }
@@ -69,7 +72,12 @@ namespace SpaceGame
 
         public void SelectShip(Ship ship)
         {
+            if (selectedShip != null)
+            {
+                selectedShip.selected = false;
+            }
             selectedShip = ship;
+            selectedShip.selected = true;
             editor.selectedShip = ship;
             camController.SetFollowTarget(ship.transform);
             moveMarker.transform.position = ship.GetMoveTarget();

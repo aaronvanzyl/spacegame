@@ -11,7 +11,7 @@ namespace SpaceGame
         public float maxSize;
 
         Transform follow;
-        Rigidbody2D followRigidBody;
+        Vector2 comOffset;
 
         Camera cam;
         Vector2 offset;
@@ -36,13 +36,7 @@ namespace SpaceGame
                 transform.position = new Vector3(offset.x, offset.y, transform.position.z);
             }
             else {
-                if (followRigidBody != null)
-                {
-                    transform.position = new Vector3(followRigidBody.worldCenterOfMass.x, followRigidBody.worldCenterOfMass.y, transform.position.z) + (Vector3)offset;
-                }
-                else {
-                    transform.position = new Vector3(follow.position.x, follow.position.y, transform.position.z) + (Vector3)offset;
-                }
+                transform.position = new Vector3(follow.position.x, follow.position.y, transform.position.z) + (Vector3)offset + (Vector3) comOffset;
             }
             
             cam.orthographicSize -= Input.mouseScrollDelta.y;
@@ -56,7 +50,14 @@ namespace SpaceGame
 
         public void SetFollowTarget(Transform target) {
             follow = target;
-            followRigidBody = follow.GetComponentInParent<Rigidbody2D>();
+            Rigidbody2D rb2d = follow.GetComponentInParent<Rigidbody2D>();
+            if (rb2d != null)
+            {
+                comOffset = rb2d.centerOfMass;
+            }
+            else {
+                comOffset = Vector2.zero;
+            }
             offset = Vector2.zero;
         }
     }

@@ -32,17 +32,20 @@ namespace SpaceGame
         public List<GameObject> spawnOnDeath;
         IPunObservable[] syncedComponents;
 
-        public Sprite outline;
+        SpriteRenderer spriteRenderer;
+        public SpriteRenderer outline;
 
         private void Awake()
         {
             syncedComponents = GetComponentsInChildren<IPunObservable>();
             health = maxHealth;
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            outline.sprite = spriteRenderer.sprite;
         }
 
         private void Start()
         {
-            damageParticles.system.textureSheetAnimation.SetSprite(0, GetComponent<SpriteRenderer>().sprite);
+            damageParticles.system.textureSheetAnimation.SetSprite(0, spriteRenderer.sprite);
         }
 
         public bool HasSyncedComponents()

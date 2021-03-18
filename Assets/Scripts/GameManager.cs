@@ -22,6 +22,9 @@ namespace SpaceGame
             Instance = this;
 
             localTeamID = Random.Range(int.MinValue, int.MaxValue);
+            Team team = new Team(localTeamID);
+            AddTeam(team);
+            photonView.RPC("AddTeam", RpcTarget.Others, team);
 
             Vector2 pos = Random.insideUnitCircle * 10;
             Ship localShip = InstantiateEmptyShip(pos, Quaternion.identity);
@@ -29,9 +32,7 @@ namespace SpaceGame
             localShip.SetTileNetwork(Vector2Int.zero, 0, localShip.centerTileType);
             FindObjectOfType<Controller>().SelectShip(localShip);
 
-            Team team = new Team(localTeamID);
-            AddTeam(team);
-            photonView.RPC("AddTeam", RpcTarget.Others, team);
+            
         }
 
         public Ship InstantiateEmptyShip(Vector2 pos, Quaternion rotation) {
