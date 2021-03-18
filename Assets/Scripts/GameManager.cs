@@ -14,21 +14,54 @@ namespace SpaceGame
         [HideInInspector]
         public List<Ship> ships;
         public Ship shipPrefab;
+        public Dictionary<int, Team> teams = new Dictionary<int, Team>();
+        public int localTeamID;
 
         public void Awake()
         {
             Instance = this;
+
+            localTeamID = Random.Range(int.MinValue, int.MaxValue);
+
             Vector2 pos = Random.insideUnitCircle * 10;
             Ship localShip = InstantiateEmptyShip(pos, Quaternion.identity);
+            localShip.teamID = localTeamID;
             localShip.SetTileNetwork(Vector2Int.zero, 0, localShip.centerTileType);
             FindObjectOfType<Controller>().SelectShip(localShip);
 
+            Team team = new Team(localTeamID);
+            AddTeam(team);
+            photonView.RPC("AddTeam", RpcTarget.Others, team);
         }
 
         public Ship InstantiateEmptyShip(Vector2 pos, Quaternion rotation) {
             Ship ship = PhotonNetwork.Instantiate(shipPrefab.name, pos, rotation).GetComponent<Ship>();
             ship.photonView.TransferOwnership(PhotonNetwork.MasterClient);
             return ship;
+        }
+
+        [PunRPC]
+        public void AddTeam(Team team) {
+            if (teams.ContainsKey(team.id)) {
+                Debug.LogWarning("Already have team " + team.id);
+                return;
+            }
+            teams.Add(team.id, team);
+            Debug.Log("Added team " + team.id + " / " + teams.Count);
+        }
+
+        [PunRPC]
+        public void AddTeams(Team[] teamArr)
+        {
+            foreach (Team t in teamArr) {
+                if (teams.ContainsKey(t.id))
+                {
+                    Debug.LogWarning("Already have team[s] " + t.id);
+                    continue;
+                }
+                teams.Add(t.id, t);
+                Debug.Log("Added team[s] " + t.id + " / " + teams.Count);
+            }
         }
 
         #region Photon Callbacks
@@ -50,7 +83,9 @@ namespace SpaceGame
             if (PhotonNetwork.IsMasterClient)
             {
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
-
+                Team[] teamArr = new Team[teams.Values.Count];
+                teams.Values.CopyTo(teamArr, 0);
+                photonView.RPC("AddTeams", other, teamArr);
 
                 //LoadArena();
             }

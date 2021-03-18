@@ -17,6 +17,8 @@ public class CustomSerialize : MonoBehaviour
         byte code = 0;
         PhotonPeer.RegisterType(typeof(Vector2Int), code, SerializeVector2Int, DeserializeVector2Int);
         code += 1;
+        PhotonPeer.RegisterType(typeof(Team), code, Team.SerializeTeam, Team.DeserializeTeam);
+        code += 1;
     }
 
     public static object DeserializeVector2Int(byte[] data)

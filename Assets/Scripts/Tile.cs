@@ -10,7 +10,6 @@ namespace SpaceGame
     {
         public bool canRotate;
 
-        [HideInInspector]
         public int tileType;
         public Ship ship;
         [HideInInspector]
@@ -30,15 +29,14 @@ namespace SpaceGame
         public float flatCollisionDamage;
 
         public List<GameObject> spawnOnDeath;
-
         IPunObservable[] syncedComponents;
+
+        public Sprite outline;
 
         private void Awake()
         {
             syncedComponents = GetComponentsInChildren<IPunObservable>();
             health = maxHealth;
-
-
         }
 
         private void Start()

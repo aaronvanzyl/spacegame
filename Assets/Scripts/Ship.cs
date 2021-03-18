@@ -20,7 +20,7 @@ namespace SpaceGame
         [HideInInspector]
         public Rigidbody2D rb2d;
         [HideInInspector]
-        public int team;
+        public int teamID;
 
         [HideInInspector]
         public Dictionary<Vector2Int, Tile> tiles = new Dictionary<Vector2Int, Tile>();
@@ -43,12 +43,17 @@ namespace SpaceGame
 
         void Start()
         {
-            team = photonView.ViewID;
             GameManager.Instance.ships.Add(this);
+
         }
 
         void Update()
         {
+            if (GameManager.Instance.teams.TryGetValue(teamID, out Team team)) {
+                foreach (Tile tile in tiles.Values) {
+                    //tile.GetComponent<SpriteRenderer>().color = team.color;
+                }
+            }
             //debugLabel.text = photonView.Owner.ActorNumber + " " + controller.photonView.Owner.ActorNumber;
             //debugLabel.text = photonView.Owner.NickName;
         }
@@ -136,7 +141,13 @@ namespace SpaceGame
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
-
+            if (stream.IsWriting)
+            {
+                stream.SendNext(teamID);
+            }
+            else {
+                teamID =  (int)stream.ReceiveNext();
+            }
             foreach (Tile tile in tiles.Values) {
                 if (tile.HasSyncedComponents()) {
                     tile.OnPhotonSerializeView(stream, info);
@@ -150,6 +161,7 @@ namespace SpaceGame
         {
             // Create tile
             Tile tile = Instantiate(tileLookup.tilePrefabs[tileType], transform).GetComponent<Tile>();
+            tile.tileType = tileType;
             AttachTile(x, y, rotation, tile);
         }
 
@@ -273,6 +285,7 @@ namespace SpaceGame
             List<List<Vector2Int>> SCCs = FindSCCs();
             for (int i = 1; i < SCCs.Count; i++) {
                 Ship newShip = GameManager.Instance.InstantiateEmptyShip(transform.position, transform.rotation);
+                newShip.teamID = teamID;
                 MoveTilesRPC(SCCs[i].ToArray(), newShip.photonView.ViewID);
             }
 
