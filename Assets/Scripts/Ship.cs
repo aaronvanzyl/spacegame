@@ -271,10 +271,7 @@ namespace SpaceGame
 
         public void AttemptSplit () {
             List<List<Vector2Int>> SCCs = FindSCCs();
-
-            Debug.Log("SCCs: " + SCCs.Count);
             for (int i = 1; i < SCCs.Count; i++) {
-                Print(SCCs[i]);
                 Ship newShip = GameManager.Instance.InstantiateEmptyShip(transform.position, transform.rotation);
                 MoveTilesRPC(SCCs[i].ToArray(), newShip.photonView.ViewID);
             }

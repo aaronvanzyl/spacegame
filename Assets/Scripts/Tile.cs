@@ -92,20 +92,15 @@ namespace SpaceGame
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            Debug.Log("Collision enter");
             if (!ship.photonView.IsMine)
             {
-                Debug.Log("Collision exit: not my photon view");
                 return;
             }
             if (collision.collider.TryGetComponent(out Tile other))
             {
-                Debug.Log("Found other tile");
                 if (other.ship != ship)
                 {
-                    Debug.Log("Different ships");
                     float damage = flatCollisionDamage + forceCollisionDamage * collision.relativeVelocity.magnitude;
-                    Debug.Log(damage + " collision!");
                     ReceiveDamage(damage);
                 }
             }
