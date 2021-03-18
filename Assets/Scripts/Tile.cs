@@ -61,7 +61,9 @@ namespace SpaceGame
                 }
                 else
                 {
-                    health = (float)stream.ReceiveNext();
+                    float newHealth = (float)stream.ReceiveNext();
+                    damageParticles.system.Emit((int)(health - newHealth) * 3);
+                    health = newHealth;
                 }
                 component.OnPhotonSerializeView(stream, info);
             }
