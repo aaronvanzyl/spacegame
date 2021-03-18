@@ -148,7 +148,7 @@ namespace SpaceGame
                 }
                 else if (underCursor != null && attachedShip == selectedShip && Input.GetButtonDown("Fire2"))
                 {
-                    attachedShip.DestroyTileNetwork(tilePos);
+                    attachedShip.DestroyTileNetwork(tilePos, true);
                 }
             }
         }

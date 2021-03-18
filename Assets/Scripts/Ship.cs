@@ -157,7 +157,7 @@ namespace SpaceGame
             Vector2Int pos = new Vector2Int(x, y);
             if (tiles.TryGetValue(pos, out Tile existing))
             {
-                DestroyTile(existing);
+                DestroyTile(existing, true);
             }
 
             tile.transform.parent = transform;
@@ -179,12 +179,12 @@ namespace SpaceGame
         }
 
         [PunRPC]
-        void DestroyTileRPC(int x, int y)
+        void DestroyTileRPC(int x, int y, bool silent)
         {
             Vector2Int pos = new Vector2Int(x, y);
             if (tiles.TryGetValue(pos, out Tile existing))
             {
-                DestroyTile(existing);
+                DestroyTile(existing, silent);
             }
         }
 
@@ -203,9 +203,9 @@ namespace SpaceGame
             photonView.RPC("SetTileRPC", RpcTarget.All, pos.x, pos.y, rotation, tileType);
         }
 
-        public void DestroyTileNetwork(Vector2Int pos)
+        public void DestroyTileNetwork(Vector2Int pos, bool silent)
         {
-            photonView.RPC("DestroyTileRPC", RpcTarget.All, pos.x, pos.y);
+            photonView.RPC("DestroyTileRPC", RpcTarget.All, pos.x, pos.y, silent);
         }
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -236,10 +236,10 @@ namespace SpaceGame
         }
 
 
-        public void DestroyTile(Tile tile)
+        public void DestroyTile(Tile tile, bool silent)
         {
             DetachTile(tile);
-            Destroy(tile.gameObject);
+            tile.Die(silent);
 
             AttemptSplit();
         }

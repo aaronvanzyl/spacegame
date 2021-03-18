@@ -38,7 +38,7 @@ namespace SpaceGame
             syncedComponents = GetComponentsInChildren<IPunObservable>();
             health = maxHealth;
 
-            
+
         }
 
         private void Start()
@@ -67,27 +67,40 @@ namespace SpaceGame
             }
         }
 
-        public void NetworkDestroy()
+        public void NetworkDestroy(bool silent)
         {
-            ship.DestroyTileNetwork(pos);
+            ship.DestroyTileNetwork(pos, silent);
         }
 
         public void ReceiveDamage(float damage)
         {
+            if (!ship.photonView.IsMine) {
+                return;
+            }
             if (health > 0)
             {
+
+                damageParticles.system.Emit((int)Mathf.Min(damage, health) * 3);
                 health -= damage;
-                damageParticles.system.Emit((int)damage * 3);
                 if (health <= 0)
                 {
-                    damageParticles.Detach();
-                    foreach (GameObject g in spawnOnDeath)
-                    {
-                        PhotonNetwork.Instantiate(g.name, transform.position, Quaternion.identity);
-                    }
-                    NetworkDestroy();
+                    NetworkDestroy(false);
                 }
             }
+        }
+
+        public void Die(bool silent)
+        {
+            if (!silent)
+            {
+                damageParticles.system.Emit((int)health * 3);
+                damageParticles.Detach();
+                foreach (GameObject g in spawnOnDeath)
+                {
+                    Instantiate(g, transform.position, Quaternion.identity);
+                }
+            }
+            Destroy(gameObject);
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
