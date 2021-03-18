@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0, z: 1}
   m_Children: []
   m_Father: {fileID: 2318569571033114820}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
 --- !u!212 &393839623
 SpriteRenderer:
@@ -94,7 +94,6 @@ GameObject:
   - component: {fileID: 2318569571033114823}
   - component: {fileID: 2318569571033114822}
   - component: {fileID: -2137513789840883781}
-  - component: {fileID: -1735742245687149879}
   m_Layer: 0
   m_Name: Thruster Tile
   m_TagString: Untagged
@@ -113,6 +112,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 6901631082198296663}
   - {fileID: 393839622}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -224,33 +224,96 @@ MonoBehaviour:
   tileType: 0
   ship: {fileID: 0}
   pos: {x: 0, y: 0}
---- !u!114 &-1735742245687149879
-MonoBehaviour:
+  maxHealth: 10
+  health: 0
+  damageParticles: {fileID: 3650467864620735720}
+  forceCollisionDamage: 5
+  flatCollisionDamage: 0
+  spawnOnDeath: []
+--- !u!1001 &3248869972331975623
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 2318569571033114820}
+    m_Modifications:
+    - target: {fileID: 8273617062190824045, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_Name
+      value: ExplosionParticles
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b417dc8501932b342b4a975a1da3123b, type: 3}
+--- !u!4 &6901631082198296663 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3248869972331975623}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2318569571033116473}
+--- !u!114 &3650467864620735720 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2287651762220650287, guid: b417dc8501932b342b4a975a1da3123b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3248869972331975623}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 447c67ac4ba2ba94782a85d37ad79e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: bfc641a47b8f95044b49f75fa70b95ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  forceCollisionDamage: 0.5
-  flatCollisionDamage: 0
-  destroyOnDeath: 0
-  onDeath:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: -2137513789840883781}
-        m_MethodName: NetworkDestroy
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2

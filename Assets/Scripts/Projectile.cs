@@ -26,9 +26,9 @@ namespace SpaceGame
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.TryGetComponent(out HitBox hitbox))
+            if (other.TryGetComponent(out Tile tile))
             {
-                hitbox.ReceiveDamage(damage);
+                tile.ReceiveDamage(damage);
             }
             //if(other.TryGetComponent)
         }

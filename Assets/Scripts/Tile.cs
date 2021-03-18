@@ -5,25 +5,49 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace SpaceGame
 {
+    [RequireComponent(typeof(SpriteRenderer))]
     public class Tile : MonoBehaviourPunCallbacks
     {
         public bool canRotate;
 
         [HideInInspector]
         public int tileType;
-        [HideInInspector]
         public Ship ship;
         [HideInInspector]
         public Vector2Int pos;
+        public float maxHealth;
+        public float health;
+        public TileParticles damageParticles;
+
+        /// <summary>
+        /// This object receives damage equal to value * |force| on collision.
+        /// </summary>
+        public float forceCollisionDamage;
+
+        /// <summary>
+        /// This object receives damage equal to value on collision.
+        /// </summary>
+        public float flatCollisionDamage;
+
+        public List<GameObject> spawnOnDeath;
 
         IPunObservable[] syncedComponents;
 
         private void Awake()
         {
             syncedComponents = GetComponentsInChildren<IPunObservable>();
+            health = maxHealth;
+
+            
         }
 
-        public bool HasSyncedComponents() {
+        private void Start()
+        {
+            damageParticles.system.textureSheetAnimation.SetSprite(0, GetComponent<SpriteRenderer>().sprite);
+        }
+
+        public bool HasSyncedComponents()
+        {
             return syncedComponents.Length > 0;
         }
 
@@ -31,34 +55,61 @@ namespace SpaceGame
         {
             foreach (IPunObservable component in syncedComponents)
             {
+                if (stream.IsWriting)
+                {
+                    stream.SendNext(health);
+                }
+                else
+                {
+                    health = (float)stream.ReceiveNext();
+                }
                 component.OnPhotonSerializeView(stream, info);
-                //stream.SendNext(component.NeedSync);
-                //if (component.NeedSync)
-                //{
-                //    component.NeedSync = false;
-                    
-                //}
             }
-            //if (stream.IsWriting)
-            //{
-                
-
-            //}
-            //else
-            //{
-            //    foreach (ITileSync sync in syncedComponents)
-            //    {
-            //        if ((bool)stream.ReceiveNext())
-            //        {
-            //            sync.Deserialize(stream);
-            //        }
-            //    }
-            //}
-        //}
         }
 
-        public void NetworkDestroy() {
+        public void NetworkDestroy()
+        {
             ship.DestroyTileNetwork(pos);
+        }
+
+        public void ReceiveDamage(float damage)
+        {
+            if (health > 0)
+            {
+                health -= damage;
+                damageParticles.system.Emit((int)damage * 3);
+                if (health <= 0)
+                {
+                    damageParticles.Detach();
+                    foreach (GameObject g in spawnOnDeath)
+                    {
+                        PhotonNetwork.Instantiate(g.name, transform.position, Quaternion.identity);
+                    }
+                    NetworkDestroy();
+                }
+            }
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            Debug.Log("Collision enter");
+            if (!ship.photonView.IsMine)
+            {
+                Debug.Log("Collision exit: not my photon view");
+                return;
+            }
+            if (collision.collider.TryGetComponent(out Tile other))
+            {
+                Debug.Log("Found other tile");
+                if (other.ship != ship)
+                {
+                    Debug.Log("Different ships");
+                    float damage = flatCollisionDamage + forceCollisionDamage * collision.relativeVelocity.magnitude;
+                    Debug.Log(damage + " collision!");
+                    ReceiveDamage(damage);
+                }
+            }
+
         }
 
         //public void OnPhotonInstantiate(PhotonMessageInfo info)

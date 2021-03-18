@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4925237786469524397}
   - component: {fileID: 6161370968877802663}
   - component: {fileID: -1129959553196538031}
-  - component: {fileID: 6174179259831031101}
   m_Layer: 0
   m_Name: Metal Wall Tile
   m_TagString: Untagged
@@ -30,7 +29,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.480746, y: -2.265909, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 8471308670826007267}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -126,33 +126,96 @@ MonoBehaviour:
   tileType: 0
   ship: {fileID: 0}
   pos: {x: 0, y: 0}
---- !u!114 &6174179259831031101
-MonoBehaviour:
+  maxHealth: 10
+  health: 0
+  damageParticles: {fileID: 1801078746284736092}
+  forceCollisionDamage: 5
+  flatCollisionDamage: 0
+  spawnOnDeath: []
+--- !u!1001 &522954923826737523
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 4925237786469524396}
+    m_Modifications:
+    - target: {fileID: 8273617062190824045, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_Name
+      value: ExplosionParticles
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b417dc8501932b342b4a975a1da3123b, type: 3}
+--- !u!4 &8471308670826007267 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8273617062190824336, guid: b417dc8501932b342b4a975a1da3123b,
+    type: 3}
+  m_PrefabInstance: {fileID: 522954923826737523}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4925237786469524434}
+--- !u!114 &1801078746284736092 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2287651762220650287, guid: b417dc8501932b342b4a975a1da3123b,
+    type: 3}
+  m_PrefabInstance: {fileID: 522954923826737523}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 447c67ac4ba2ba94782a85d37ad79e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: bfc641a47b8f95044b49f75fa70b95ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  forceCollisionDamage: 0.5
-  flatCollisionDamage: 0
-  destroyOnDeath: 0
-  onDeath:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: -1129959553196538031}
-        m_MethodName: NetworkDestroy
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
