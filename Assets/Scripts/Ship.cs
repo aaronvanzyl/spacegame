@@ -35,7 +35,9 @@ namespace SpaceGame
 
         Vector2Int[] tileDirs = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
-        
+        const int DELIMITER = int.MinValue + 1;
+
+
         void Awake()
         {
             rb2d = GetComponent<Rigidbody2D>();
@@ -49,8 +51,10 @@ namespace SpaceGame
 
         void Update()
         {
-            if (GameManager.Instance.teams.TryGetValue(teamID, out Team team)) {
-                foreach (Tile tile in tiles.Values) {
+            if (GameManager.Instance.teams.TryGetValue(teamID, out Team team))
+            {
+                foreach (Tile tile in tiles.Values)
+                {
                     //tile.GetComponent<SpriteRenderer>().color = team.color;
                 }
             }
@@ -65,7 +69,8 @@ namespace SpaceGame
                 return;
             }
 
-            if (Vector2.Distance(transform.position, moveTarget) < 3f) {
+            if (Vector2.Distance(transform.position, moveTarget) < 3f)
+            {
                 hasMoveTarget = false;
             }
             if (Vector2.Distance(transform.position, rotateTarget) < 3f)
@@ -144,13 +149,41 @@ namespace SpaceGame
             if (stream.IsWriting)
             {
                 stream.SendNext(teamID);
+                int syncCount = 0;
+                //foreach (Tile tile in tiles.Values)
+                //{
+                //    if (tile.HasSyncedComponents())
+                //    {
+                //        syncCount++;
+                //    }
+                //}
+                syncCount = tiles.Count;
+                stream.SendNext(syncCount);
+
+                foreach (Tile tile in tiles.Values)
+                {
+                    //if (tile.HasSyncedComponents())
+                    //{
+                        stream.SendNext(tile.pos);
+                        tile.OnPhotonSerializeView(stream, info);
+                        stream.SendNext(DELIMITER);
+                    //}
+                }
+
             }
             else {
-                teamID =  (int)stream.ReceiveNext();
-            }
-            foreach (Tile tile in tiles.Values) {
-                if (tile.HasSyncedComponents()) {
-                    tile.OnPhotonSerializeView(stream, info);
+                teamID = (int)stream.ReceiveNext();
+                int syncCount = (int) stream.ReceiveNext();
+                for (int i = 0; i < syncCount; i++) { 
+                    Vector2Int pos = (Vector2Int)stream.ReceiveNext();
+                    if (tiles.TryGetValue(pos, out Tile tile))
+                    {
+                        tile.OnPhotonSerializeView(stream, info);
+                        stream.ReceiveNext(); //Receive delimiter
+                    }
+                    else {
+                        while ((int)stream.ReceiveNext() != DELIMITER) { }
+                    }
                 }
             }
         }
@@ -165,7 +198,8 @@ namespace SpaceGame
             AttachTile(x, y, rotation, tile);
         }
 
-        void AttachTile(int x, int y, float rotation, Tile tile) {
+        void AttachTile(int x, int y, float rotation, Tile tile)
+        {
             Vector2Int pos = new Vector2Int(x, y);
             if (tiles.TryGetValue(pos, out Tile existing))
             {
@@ -201,9 +235,11 @@ namespace SpaceGame
         }
 
         [PunRPC]
-        void MoveTilesRPC(Vector2Int[] posList, int targetID) {
+        void MoveTilesRPC(Vector2Int[] posList, int targetID)
+        {
             Ship target = PhotonNetwork.GetPhotonView(targetID).GetComponent<Ship>();
-            foreach (Vector2Int pos in posList) {
+            foreach (Vector2Int pos in posList)
+            {
                 Tile tile = tiles[pos];
                 DetachTile(tile);
                 target.AttachTile(pos.x, pos.y, tile.transform.localEulerAngles.z, tile);
@@ -272,18 +308,22 @@ namespace SpaceGame
             tile.ship = null;
         }
 
-        void Print<T>(List<T> list) {
+        void Print<T>(List<T> list)
+        {
             string s = "";
-            foreach (object o in list) {
+            foreach (object o in list)
+            {
                 s += o;
             }
             Debug.Log(s);
 
         }
 
-        public void AttemptSplit () {
+        public void AttemptSplit()
+        {
             List<List<Vector2Int>> SCCs = FindSCCs();
-            for (int i = 1; i < SCCs.Count; i++) {
+            for (int i = 1; i < SCCs.Count; i++)
+            {
                 Ship newShip = GameManager.Instance.InstantiateEmptyShip(transform.position, transform.rotation);
                 newShip.teamID = teamID;
                 MoveTilesRPC(SCCs[i].ToArray(), newShip.photonView.ViewID);
@@ -291,11 +331,14 @@ namespace SpaceGame
 
         }
 
-        public List<List<Vector2Int>> FindSCCs() {
+        public List<List<Vector2Int>> FindSCCs()
+        {
             List<List<Vector2Int>> SCCs = new List<List<Vector2Int>>();
             HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-            foreach (Tile tile in tiles.Values) {
-                if (!visited.Contains(tile.pos)) {
+            foreach (Tile tile in tiles.Values)
+            {
+                if (!visited.Contains(tile.pos))
+                {
                     List<Vector2Int> scc = new List<Vector2Int>();
                     Queue<Vector2Int> edge = new Queue<Vector2Int>();
                     edge.Enqueue(tile.pos);
