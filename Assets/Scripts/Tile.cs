@@ -10,6 +10,7 @@ namespace SpaceGame
     {
         public bool canRotate;
 
+        [HideInInspector]
         public int tileType;
         public Ship ship;
         [HideInInspector]

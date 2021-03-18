@@ -132,6 +132,7 @@ MonoBehaviour:
   forceCollisionDamage: 5
   flatCollisionDamage: 0
   spawnOnDeath: []
+  outline: {fileID: 0}
 --- !u!1001 &522954923826737523
 PrefabInstance:
   m_ObjectHideFlags: 0
