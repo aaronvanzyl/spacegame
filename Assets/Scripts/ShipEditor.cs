@@ -31,7 +31,7 @@ namespace SpaceGame
         {
             foreach (Tile tile in tileLookup.tilePrefabs)
             {
-                tileSelectionGroup.AddSelectOption(tile.GetComponent<SpriteRenderer>().sprite);
+                tileSelectionGroup.AddSelectOption(tile.preview);
             }
             tileSelectionGroup.OnToggle(0);
             ToggleOn(false);
@@ -160,7 +160,7 @@ namespace SpaceGame
             {
                 selectedTile = tileLookup.tilePrefabs[selectedTileIndex];
                 selectedTileIsSolid = !selectedTile.GetComponent<Collider2D>().isTrigger;
-                ghost.sprite = selectedTileSprite = selectedTile.GetComponent<SpriteRenderer>().sprite;
+                ghost.sprite = selectedTileSprite = selectedTile.preview;
             }
         }
 

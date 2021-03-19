@@ -29,6 +29,9 @@ namespace SpaceGame
         Vector2 rotateTarget = Vector2.zero;
         bool hasRotateTarget = false;
 
+        Vector2 turretTarget = Vector2.zero;
+        bool turretActive = false;
+
         const float E = 0.001f;
         const float rotationTolerance = 0.01f;
 
@@ -492,6 +495,23 @@ namespace SpaceGame
         public Vector2 GetRotateTarget()
         {
             return moveTarget;
+        }
+
+        [PunRPC]
+        public void SetTurretTarget(Vector2 target, bool triggered)
+        {
+            turretTarget = target;
+            turretActive = triggered;
+        }
+
+        public Vector2 GetTurretTarget()
+        {
+            return turretTarget;
+        }
+
+        public bool GetTurretActive()
+        {
+            return turretActive;
         }
     }
 

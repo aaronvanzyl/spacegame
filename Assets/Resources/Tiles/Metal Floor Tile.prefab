@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canRotate: 0
+  preview: {fileID: 21300000, guid: 85a44dee6b203da4faa2d050765acbc4, type: 3}
   tileType: 0
   ship: {fileID: 0}
   pos: {x: 0, y: 0}

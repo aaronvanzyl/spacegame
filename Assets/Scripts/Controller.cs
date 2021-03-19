@@ -58,6 +58,9 @@ namespace SpaceGame
                         selectedShip.photonView.RPC("SetMoveTarget", selectedShip.photonView.Owner, cursorPos);
                     }
                 }
+
+                // cursor pos, if middle mouse is down
+                selectedShip.photonView.RPC("SetTurretTarget", selectedShip.photonView.Owner, cursorPos, Input.GetMouseButton(2));
             }
             //else
             //{
