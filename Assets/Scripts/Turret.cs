@@ -43,6 +43,7 @@ namespace SpaceGame
             {
                 Vector2 vec2target = tile.ship.GetTurretTarget() - (Vector2)transform.position;
                 turretChild.transform.up = vec2target;
+                rotation = vec2target;
                 if (tile.ship.GetTurretActive())
                 {
                     if (timeSinceFire > fireDelay)
@@ -81,13 +82,15 @@ namespace SpaceGame
             if (stream.IsWriting)
             {
                 stream.SendNext(rotation);
+                //stream.SendNext(turretChild.transform.up);
             }
             else
             {
                 rotation = (Vector2)stream.ReceiveNext();
+                //turretChild.transform.up = (Vector3)stream.ReceiveNext();
             }
 
-            transform.up = (Vector3)rotation;
+            turretChild.transform.up = (Vector3)rotation;
         }
     }
 }
